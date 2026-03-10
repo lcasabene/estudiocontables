@@ -8,46 +8,48 @@ services:
     expose:
       - "80"
     environment:
-      - APP_BASE_PATH=/
-      - APP_DEBUG=false
-      - APP_ENCRYPTION_KEY=${APP_ENCRYPTION_KEY:-CHANGE_THIS_KEY_IN_PRODUCTION_32B!}
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-estudiocontable}
-      - DB_USERNAME=${DB_USERNAME:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      APP_BASE_PATH: "/"
+      APP_DEBUG: "false"
+      APP_ENCRYPTION_KEY: "clave-secreta-produccion-32bytes!"
+      DB_HOST: "db"
+      DB_PORT: "3306"
+      DB_DATABASE: "estudiocontable"
+      DB_USERNAME: "root"
+      DB_PASSWORD: "Casabene2025!"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     restart: unless-stopped
+    networks:
+      - backend
 
   db:
     image: mysql:8.0
-    expose:
-      - "3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_DATABASE: ${DB_DATABASE:-estudiocontable}
+      MYSQL_ROOT_PASSWORD: "Casabene2025!"
+      MYSQL_DATABASE: "estudiocontable"
     volumes:
       - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
+    networks:
+      - backend
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     expose:
       - "80"
     environment:
-      PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: ${DB_PASSWORD:-secret}
+      PMA_HOST: "db"
+      PMA_USER: "root"
+      PMA_PASSWORD: "Casabene2025!"
     depends_on:
       - db
     restart: unless-stopped
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
 
 volumes:
   mysql_data:
