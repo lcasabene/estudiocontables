@@ -1,0 +1,10 @@
+.env
+.git
+.gitignore
+.vscode
+.idea
+database/*.sql
+README.md
+*.log
+Thumbs.db
+.DS_Store

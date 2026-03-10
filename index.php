@@ -53,9 +53,14 @@ date_default_timezone_set('America/Argentina/Buenos_Aires');
 Session::start();
 
 // Parse URI
-$basePath = '/estudiocontable';
+$appConfig = require __DIR__ . '/config/app.php';
+$basePath = rtrim($appConfig['base_path'], '/');
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = substr($requestUri, strlen($basePath)) ?: '/';
+if ($basePath !== '' && str_starts_with($requestUri, $basePath)) {
+    $uri = substr($requestUri, strlen($basePath)) ?: '/';
+} else {
+    $uri = $requestUri ?: '/';
+}
 $uri = '/' . trim($uri, '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
