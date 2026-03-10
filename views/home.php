@@ -33,7 +33,7 @@
         <p class="text-muted mb-4">Sistema de Gestión para Estudios Contables</p>
         <div class="mb-3">
             <p class="small text-muted">Ingrese a su estudio mediante la URL:</p>
-            <code class="fs-6">/estudiocontable/{slug-del-estudio}/login</code>
+            <code class="fs-6"><?= base_url('{slug-del-estudio}/login') ?></code>
         </div>
         <hr>
         <p class="small text-muted mb-2">Estudio de demostración:</p>

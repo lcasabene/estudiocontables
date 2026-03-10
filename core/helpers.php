@@ -6,8 +6,20 @@ use Core\Tenant;
 
 function base_url(string $path = ''): string
 {
-    $config = require __DIR__ . '/../config/app.php';
-    return rtrim($config['url'], '/') . '/' . ltrim($path, '/');
+    static $baseUrl = null;
+    if ($baseUrl === null) {
+        $appUrl = getenv('APP_URL');
+        if ($appUrl && $appUrl !== '') {
+            $baseUrl = rtrim($appUrl, '/');
+        } else {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $config = require __DIR__ . '/../config/app.php';
+            $basePath = rtrim($config['base_path'] ?? '', '/');
+            $baseUrl = $scheme . '://' . $host . $basePath;
+        }
+    }
+    return $baseUrl . '/' . ltrim($path, '/');
 }
 
 function tenant_url(string $path = ''): string
