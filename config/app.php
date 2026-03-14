@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'name' => 'EstudioContable SaaS',
+    'name' => 'Estudio Contable Casabene',
     'url' => getenv('APP_URL') ?: 'http://localhost/estudiocontable',
     'base_path' => getenv('APP_BASE_PATH') ?: '/',
     'debug' => filter_var(getenv('APP_DEBUG') ?: 'true', FILTER_VALIDATE_BOOLEAN),

@@ -1,5 +1,5 @@
 -- =============================================
--- MIGRACIÓN: De 2 bases (saas_master + tenant_demo) a 1 sola base
+-- MIGRACIÓN: De 2 bases (saas_master + tenant) a 1 sola base
 -- 
 -- INSTRUCCIONES:
 -- 1. Hacer backup de ambas bases antes de ejecutar
@@ -26,31 +26,31 @@ INSERT IGNORE INTO `estudiocontable`.`estudio_db` SELECT * FROM `saas_master`.`e
 CREATE TABLE IF NOT EXISTS `estudiocontable`.`login_attempts` LIKE `saas_master`.`login_attempts`;
 INSERT IGNORE INTO `estudiocontable`.`login_attempts` SELECT * FROM `saas_master`.`login_attempts`;
 
--- Paso 3: Copiar tablas tenant desde tenant_demo
+-- Paso 3: Copiar tablas tenant
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`usuarios` LIKE `tenant_demo`.`usuarios`;
-INSERT IGNORE INTO `estudiocontable`.`usuarios` SELECT * FROM `tenant_demo`.`usuarios`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`usuarios` LIKE `tenant_estudio`.`usuarios`;
+INSERT IGNORE INTO `estudiocontable`.`usuarios` SELECT * FROM `tenant_estudio`.`usuarios`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`clientes` LIKE `tenant_demo`.`clientes`;
-INSERT IGNORE INTO `estudiocontable`.`clientes` SELECT * FROM `tenant_demo`.`clientes`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`clientes` LIKE `tenant_estudio`.`clientes`;
+INSERT IGNORE INTO `estudiocontable`.`clientes` SELECT * FROM `tenant_estudio`.`clientes`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`cliente_usuarios` LIKE `tenant_demo`.`cliente_usuarios`;
-INSERT IGNORE INTO `estudiocontable`.`cliente_usuarios` SELECT * FROM `tenant_demo`.`cliente_usuarios`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`cliente_usuarios` LIKE `tenant_estudio`.`cliente_usuarios`;
+INSERT IGNORE INTO `estudiocontable`.`cliente_usuarios` SELECT * FROM `tenant_estudio`.`cliente_usuarios`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`condiciones_fiscales` LIKE `tenant_demo`.`condiciones_fiscales`;
-INSERT IGNORE INTO `estudiocontable`.`condiciones_fiscales` SELECT * FROM `tenant_demo`.`condiciones_fiscales`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`condiciones_fiscales` LIKE `tenant_estudio`.`condiciones_fiscales`;
+INSERT IGNORE INTO `estudiocontable`.`condiciones_fiscales` SELECT * FROM `tenant_estudio`.`condiciones_fiscales`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`cliente_condicion_fiscal` LIKE `tenant_demo`.`cliente_condicion_fiscal`;
-INSERT IGNORE INTO `estudiocontable`.`cliente_condicion_fiscal` SELECT * FROM `tenant_demo`.`cliente_condicion_fiscal`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`cliente_condicion_fiscal` LIKE `tenant_estudio`.`cliente_condicion_fiscal`;
+INSERT IGNORE INTO `estudiocontable`.`cliente_condicion_fiscal` SELECT * FROM `tenant_estudio`.`cliente_condicion_fiscal`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`documentos` LIKE `tenant_demo`.`documentos`;
-INSERT IGNORE INTO `estudiocontable`.`documentos` SELECT * FROM `tenant_demo`.`documentos`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`documentos` LIKE `tenant_estudio`.`documentos`;
+INSERT IGNORE INTO `estudiocontable`.`documentos` SELECT * FROM `tenant_estudio`.`documentos`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`claves_fiscales` LIKE `tenant_demo`.`claves_fiscales`;
-INSERT IGNORE INTO `estudiocontable`.`claves_fiscales` SELECT * FROM `tenant_demo`.`claves_fiscales`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`claves_fiscales` LIKE `tenant_estudio`.`claves_fiscales`;
+INSERT IGNORE INTO `estudiocontable`.`claves_fiscales` SELECT * FROM `tenant_estudio`.`claves_fiscales`;
 
-CREATE TABLE IF NOT EXISTS `estudiocontable`.`audit_log` LIKE `tenant_demo`.`audit_log`;
-INSERT IGNORE INTO `estudiocontable`.`audit_log` SELECT * FROM `tenant_demo`.`audit_log`;
+CREATE TABLE IF NOT EXISTS `estudiocontable`.`audit_log` LIKE `tenant_estudio`.`audit_log`;
+INSERT IGNORE INTO `estudiocontable`.`audit_log` SELECT * FROM `tenant_estudio`.`audit_log`;
 
 -- Paso 4: Agregar columnas nuevas si no existen (categoria, ultimo_acceso en claves_fiscales)
 ALTER TABLE `estudiocontable`.`claves_fiscales` 
@@ -62,6 +62,6 @@ UPDATE `estudiocontable`.`estudio_db` SET `db_name` = 'estudiocontable' WHERE `e
 
 -- =============================================
 -- LISTO! Ahora la app usa una sola base de datos.
--- Las bases saas_master y tenant_demo se pueden 
+-- Las bases saas_master y tenant_estudio se pueden 
 -- eliminar manualmente después de verificar que todo funcione.
 -- =============================================

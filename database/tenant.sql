@@ -1,12 +1,11 @@
 -- =============================================
 -- BASE DE DATOS TENANT (una por estudio)
--- Ejecutar reemplazando tenant_demo por el nombre real
 -- =============================================
-CREATE DATABASE IF NOT EXISTS `tenant_demo` 
+CREATE DATABASE IF NOT EXISTS `estudiocontable` 
     CHARACTER SET utf8mb4 
     COLLATE utf8mb4_unicode_ci;
 
-USE `tenant_demo`;
+USE `estudiocontable`;
 
 -- Usuarios del estudio
 CREATE TABLE IF NOT EXISTS `usuarios` (

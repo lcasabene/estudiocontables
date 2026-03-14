@@ -1,6 +1,6 @@
-# EstudioContable SaaS
+# Estudio Contable Casabene
 
-Sistema web SaaS de gestión para estudios contables con arquitectura multi-tenant.
+Sistema web de gestión para el Estudio Contable Casabene.
 
 ## Stack Tecnológico
 - **Backend:** PHP 8+ (PDO)
@@ -24,7 +24,7 @@ Ejecutar los scripts SQL en orden:
 # 1. Crear base de datos maestra
 mysql -u root < database/master.sql
 
-# 2. Crear base de datos del tenant demo
+# 2. Crear tablas tenant
 mysql -u root < database/tenant.sql
 ```
 
@@ -40,9 +40,7 @@ Editar `config/app.php` con la URL base y la clave de cifrado.
 ### 5. Acceder
 
 - **URL Principal:** `http://localhost/estudiocontable`
-- **Demo Login:** `http://localhost/estudiocontable/demo/login`
-- **Usuario:** `admin@estudio.com`
-- **Contraseña:** `admin123`
+- **Login:** `http://localhost/estudiocontable/estudio/login`
 
 ## Estructura del Proyecto
 

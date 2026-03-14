@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
 ) ENGINE=InnoDB;
 
 -- =============================================
--- INSERTAR ESTUDIO DE EJEMPLO (demo)
+-- INSERTAR ESTUDIO PRINCIPAL
 -- =============================================
 INSERT INTO `estudios` (`nombre`, `slug`, `activo`) VALUES
-('Estudio Demo', 'demo', 1);
+('Estudio Contable Casabene', 'estudio', 1);
 
 INSERT INTO `estudio_db` (`estudio_id`, `db_host`, `db_name`, `db_user`, `db_pass`) VALUES
-(1, '127.0.0.1', 'tenant_demo', 'root', '');
+(1, '127.0.0.1', 'estudiocontable', 'root', '');
