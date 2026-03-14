@@ -8,6 +8,7 @@ services:
     expose:
       - "80"
     environment:
+      APP_URL: "https://contadorarielcasabene.online"
       APP_BASE_PATH: "/"
       APP_DEBUG: "false"
       APP_ENCRYPTION_KEY: "clave-secreta-produccion-32bytes!"

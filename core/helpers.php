@@ -12,7 +12,8 @@ function base_url(string $path = ''): string
         if ($appUrl && $appUrl !== '') {
             $baseUrl = rtrim($appUrl, '/');
         } else {
-            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $forwardedProto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null;
+            $scheme = ($forwardedProto === 'https' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')) ? 'https' : 'http';
             $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
             $config = require __DIR__ . '/../config/app.php';
             $basePath = rtrim($config['base_path'] ?? '', '/');
