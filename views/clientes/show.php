@@ -100,6 +100,15 @@
             <a href="<?= tenant_url('clientes') ?>" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Volver al listado
             </a>
+            <?php if (is_admin()): ?>
+            <form method="POST" action="<?= tenant_url("clientes/{$cliente['id']}/delete") ?>" 
+                  onsubmit="return confirm('¿Está seguro que desea eliminar este cliente?')">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-trash"></i> Eliminar Cliente
+                </button>
+            </form>
+            <?php endif; ?>
         </div>
 
         <div class="card mt-3">

@@ -106,13 +106,17 @@ $(function() {
                 orderable: false,
                 render: function(id) {
                     let base = '<?= tenant_url("clientes") ?>';
-                    return `
+                    let html = `
                         <div class="btn-group btn-group-sm">
                             <a href="${base}/${id}/ver" class="btn btn-outline-info" title="Ver"><i class="bi bi-eye"></i></a>
                             <a href="${base}/${id}/editar" class="btn btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
                             <a href="${base}/${id}/claves" class="btn btn-outline-danger" title="Claves"><i class="bi bi-key"></i></a>
-                            <a href="${base}/${id}/documentos" class="btn btn-outline-success" title="Documentos"><i class="bi bi-folder"></i></a>
-                        </div>`;
+                            <a href="${base}/${id}/documentos" class="btn btn-outline-success" title="Documentos"><i class="bi bi-folder"></i></a>`;
+                    <?php if (is_admin()): ?>
+                    html += `<button type="button" class="btn btn-outline-danger btn-delete" data-id="${id}" title="Eliminar"><i class="bi bi-trash"></i></button>`;
+                    <?php endif; ?>
+                    html += `</div>`;
+                    return html;
                 }
             }
         ],
@@ -170,6 +174,18 @@ $(function() {
         condicionFilter = $(this).val();
         table.ajax.reload();
     });
+
+    // Delete client
+    <?php if (is_admin()): ?>
+    $('#clientes-table').on('click', '.btn-delete', function() {
+        let id = $(this).data('id');
+        if (confirm('¿Está seguro que desea eliminar este cliente?')) {
+            let form = $('<form>', { method: 'POST', action: '<?= tenant_url("clientes") ?>/' + id + '/delete' });
+            form.append($('<input>', { type: 'hidden', name: 'csrf_token', value: '<?= csrf_token() ?>' }));
+            form.appendTo('body').submit();
+        }
+    });
+    <?php endif; ?>
 
     // Helper to find condicion ID by name
     function getCondicionId(name) {
