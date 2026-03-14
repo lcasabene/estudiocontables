@@ -170,6 +170,32 @@ INSERT INTO `condiciones_fiscales` (`nombre`) VALUES
 ('Consumidor Final'),
 ('Sujeto No Categorizado');
 
+-- =============================================
+-- BLOG
+-- =============================================
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `titulo` VARCHAR(255) NOT NULL,
+    `slug` VARCHAR(255) NOT NULL UNIQUE,
+    `contenido` TEXT NOT NULL,
+    `resumen` VARCHAR(500) DEFAULT NULL,
+    `imagen_url` VARCHAR(500) DEFAULT NULL,
+    `publicado` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `blog_comments` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `post_id` INT NOT NULL,
+    `nombre` VARCHAR(100) NOT NULL,
+    `email` VARCHAR(255) DEFAULT NULL,
+    `comentario` TEXT NOT NULL,
+    `aprobado` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`post_id`) REFERENCES `blog_posts`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Usuario admin (password: admin123)
 INSERT INTO `usuarios` (`nombre_completo`, `email`, `password_hash`, `rol`) VALUES
 ('Administrador', 'admin@estudio.com', '$2y$10$hRl/ZFvKADVk2LvpYCtmnu5ecXpDYUsTxkbKKpAp0/X0AJoMv3o0C', 'admin');

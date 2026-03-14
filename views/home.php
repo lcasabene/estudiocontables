@@ -358,6 +358,100 @@
             margin-right: auto;
         }
 
+        /* ── Specialty ── */
+        .specialty-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+        .specialty-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .specialty-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--accent);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        .specialty-section h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        .specialty-section h2 span { color: var(--accent); }
+        .specialty-section .lead-text {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+        .specialty-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent);
+            transition: background 0.3s;
+        }
+        .specialty-item:hover { background: rgba(255,255,255,0.1); }
+        .specialty-item i {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin-top: 2px;
+            min-width: 28px;
+        }
+        .specialty-item h6 {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+        .specialty-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+        .specialty-icon-big {
+            font-size: 5rem;
+            color: var(--accent);
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        .specialty-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1.5rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            height: 100%;
+        }
+        .specialty-card h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .specialty-card p {
+            opacity: 0.7;
+            font-size: 0.95rem;
+        }
+
         /* ── Contact ── */
         .contact-item {
             display: flex;
@@ -436,7 +530,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand navbar-brand-text" href="#">
-                <i class="bi bi-building me-2"></i>Estudio <span>Casabene</span>
+                <i class="bi bi-building me-2"></i>Estudio <span>Luis Ariel Casabene</span>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <i class="bi bi-list text-white fs-4"></i>
@@ -444,6 +538,8 @@
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
                     <li class="nav-item"><a class="nav-link nav-link-custom" href="#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="#entidades-religiosas">Entidades Religiosas</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="<?= base_url('blog') ?>">Blog</a></li>
                     <li class="nav-item"><a class="nav-link nav-link-custom" href="#estudio">El Estudio</a></li>
                     <li class="nav-item"><a class="nav-link nav-link-custom" href="#contacto">Contacto</a></li>
                     <li class="nav-item ms-lg-2">
@@ -462,7 +558,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-7 hero-content">
                     <div class="hero-badge">Contador Publico Nacional</div>
-                    <h1>Ariel <span class="accent">Casabene</span></h1>
+                    <h1>Luis Ariel <span class="accent">Casabene</span></h1>
                     <p class="hero-subtitle">
                         Soluciones contables, impositivas y de asesoramiento integral 
                         para empresas y profesionales independientes en Argentina.
@@ -552,6 +648,58 @@
         </div>
     </section>
 
+    <!-- Especialidad: Entidades Religiosas -->
+    <section class="specialty-section" id="entidades-religiosas">
+        <div class="container position-relative">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-5 text-center fade-up">
+                    <div class="specialty-card">
+                        <div class="specialty-icon-big"><i class="bi bi-church"></i></div>
+                        <h4>Entidades Religiosas</h4>
+                        <p>Evangelicas y confesiones inscriptas en el Registro Nacional de Cultos</p>
+                    </div>
+                </div>
+                <div class="col-lg-7 fade-up">
+                    <div class="specialty-badge">Especialidad</div>
+                    <h2>Entidades <span>Religiosas Evangelicas</span></h2>
+                    <p class="lead-text">
+                        Asesoramiento integral y especializado para iglesias, asociaciones 
+                        y entidades religiosas evangelicas en todo el pais. Acompaniamos desde 
+                        la constitucion hasta la gestion contable e impositiva permanente.
+                    </p>
+                    <div class="specialty-item">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                        <div>
+                            <h6>Contabilidad y Libros</h6>
+                            <p>Registraciones contables, rubrica de libros (Diario, Inventario y Balances, Actas) y elaboracion de estados contables conforme normativa vigente.</p>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <i class="bi bi-award"></i>
+                        <div>
+                            <h6>Exenciones Impositivas</h6>
+                            <p>Tramitacion y mantenimiento de exenciones en Ganancias, IVA, Ingresos Brutos y tasas municipales. Certificados de no retencion y exclusion.</p>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <i class="bi bi-bank"></i>
+                        <div>
+                            <h6>Tramites ante Organismos de Control</h6>
+                            <p>Inscripciones y presentaciones ante el Registro Nacional de Cultos, IGJ, AFIP, Rentas provinciales y municipios.</p>
+                        </div>
+                    </div>
+                    <div class="specialty-item">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <div>
+                            <h6>Constitucion y Personeria Juridica</h6>
+                            <p>Asistencia en la constitucion de la entidad, redaccion de estatutos, obtencion de personeria juridica y filial eclesiastica.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- About -->
     <section class="about-section" id="estudio">
         <div class="container">
@@ -593,7 +741,7 @@
                         <p>Contador Publico Nacional</p>
                         <hr style="border-color: rgba(255,255,255,0.2); width: 60px; margin: 1.5rem auto;">
                         <p style="font-size:0.9rem; opacity: 0.7; max-width: 300px;">
-                            Matriculado en el Consejo Profesional de Ciencias Economicas
+                            Matriculado en el Consejo Profesional de Ciencias Economicas de Neuquén
                         </p>
                     </div>
                 </div>
@@ -627,7 +775,7 @@
                         <div class="contact-icon"><i class="bi bi-telephone"></i></div>
                         <div>
                             <h6>Telefono</h6>
-                            <p><a href="tel:+5491100000000">+54 9 11 0000-0000</a></p>
+                            <p><a href="tel:+5492995743759">+54 9 2995743759</a></p>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -641,14 +789,14 @@
                         <div class="contact-icon"><i class="bi bi-whatsapp"></i></div>
                         <div>
                             <h6>WhatsApp</h6>
-                            <p><a href="https://wa.me/5491100000000" target="_blank">Enviar mensaje</a></p>
+                            <p><a href="https://wa.me/5492995743759" target="_blank">Enviar mensaje</a></p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
                         <div>
                             <h6>Ubicacion</h6>
-                            <p>Buenos Aires, Argentina</p>
+                            <p>Neuquén, Argentina</p>
                         </div>
                     </div>
                 </div>

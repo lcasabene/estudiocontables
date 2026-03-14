@@ -106,6 +106,10 @@ $slug = Tenant::slug();
             <a href="<?= tenant_url('auditoria') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/auditoria') ? 'active' : '' ?>">
                 <i class="bi bi-shield-check"></i> Auditoría
             </a>
+            <div class="nav-section">Blog</div>
+            <a href="<?= tenant_url('blog') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/blog') ? 'active' : '' ?>">
+                <i class="bi bi-journal-text"></i> Artículos
+            </a>
             <?php endif; ?>
 
             <?php if (is_cliente()): ?>

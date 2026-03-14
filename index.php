@@ -73,6 +73,22 @@ Router::get('/', function () {
     view('home');
 });
 
+// --- BLOG PÚBLICO (must be before /{slug}/... routes) ---
+Router::get('/blog', function () {
+    $controller = new Controllers\BlogController();
+    $controller->publicIndex();
+});
+
+Router::get('/blog/{postSlug}', function (string $postSlug) {
+    $controller = new Controllers\BlogController();
+    $controller->publicShow($postSlug);
+});
+
+Router::post('/blog/{postSlug}/comentar', function (string $postSlug) {
+    $controller = new Controllers\BlogController();
+    $controller->storeComment($postSlug);
+});
+
 // Tenant routes: /{slug}/...
 Router::get('/{slug}/login', function (string $slug) {
     if (!Tenant::resolve($slug)) {
@@ -395,6 +411,52 @@ Router::get('/{slug}/portal/cliente/{id}', function (string $slug, string $id) {
     Core\Auth::requireRole($slug, 'cliente');
     $controller = new Controllers\PortalController();
     $controller->clientDetail((int)$id);
+});
+
+// --- BLOG ADMIN ---
+Router::get('/{slug}/blog', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    $controller = new Controllers\BlogController();
+    $controller->adminIndex();
+});
+
+Router::get('/{slug}/blog/crear', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    $controller = new Controllers\BlogController();
+    $controller->create();
+});
+
+Router::post('/{slug}/blog/store', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\BlogController();
+    $controller->store();
+});
+
+Router::get('/{slug}/blog/{id}/editar', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    $controller = new Controllers\BlogController();
+    $controller->edit((int)$id);
+});
+
+Router::post('/{slug}/blog/{id}/update', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\BlogController();
+    $controller->update((int)$id);
+});
+
+Router::post('/{slug}/blog/{id}/delete', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\BlogController();
+    $controller->delete((int)$id);
 });
 
 // Dispatch
