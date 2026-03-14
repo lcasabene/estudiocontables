@@ -39,8 +39,7 @@ class Auth
     public static function requireLogin(string $slug): void
     {
         if (!self::check()) {
-            header("Location: /{$slug}/login");
-            exit;
+            redirect(base_url("{$slug}/login"));
         }
     }
 
