@@ -571,20 +571,6 @@
                             <i class="bi bi-whatsapp"></i> Contactar
                         </a>
                     </div>
-                    <div class="hero-stats">
-                        <div>
-                            <div class="hero-stat-number">+15</div>
-                            <div class="hero-stat-label">Anios de experiencia</div>
-                        </div>
-                        <div>
-                            <div class="hero-stat-number">+200</div>
-                            <div class="hero-stat-label">Clientes activos</div>
-                        </div>
-                        <div>
-                            <div class="hero-stat-number">100%</div>
-                            <div class="hero-stat-label">Compromiso</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
