@@ -71,6 +71,62 @@
             color: #92400e;
         }
 
+        /* Votes */
+        .vote-section {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .vote-section .vote-title { font-weight: 700; color: var(--dark); margin-bottom: 1.2rem; font-size: 1.05rem; }
+        .vote-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            border: 2px solid;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.25s;
+            position: relative;
+        }
+        .vote-btn.like-btn {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+        .vote-btn.like-btn:hover, .vote-btn.like-btn.active {
+            background: #22c55e;
+            color: #fff;
+        }
+        .vote-btn.dislike-btn {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        .vote-btn.dislike-btn:hover, .vote-btn.dislike-btn.active {
+            background: #ef4444;
+            color: #fff;
+        }
+        .vote-btn .vote-count { font-size: 1.1rem; font-weight: 800; }
+        .vote-bar-wrap { margin-top: 1.2rem; }
+        .vote-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .vote-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, #22c55e, #16a34a);
+            border-radius: 99px;
+            transition: width 0.5s ease;
+        }
+        .vote-bar-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray); margin-top: 0.3rem; }
+
         /* Comments */
         .comments-section { margin-top: 3rem; }
         .comments-section h3 { font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; }
@@ -223,6 +279,31 @@
                         </div>
                     </div>
 
+                    <!-- Votes -->
+                    <div class="vote-section" id="vote-section">
+                        <p class="vote-title"><i class="bi bi-hand-thumbs-up me-1"></i> ¿Te resultó útil este artículo?</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="vote-btn like-btn <?= $myVote === 'like' ? 'active' : '' ?>" data-vote="like" data-url="<?= base_url('blog/' . $post['slug'] . '/votar') ?>">
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                                <span class="vote-count" id="count-like"><?= $likes ?></span>
+                            </button>
+                            <button class="vote-btn dislike-btn <?= $myVote === 'dislike' ? 'active' : '' ?>" data-vote="dislike" data-url="<?= base_url('blog/' . $post['slug'] . '/votar') ?>">
+                                <i class="bi bi-hand-thumbs-down-fill"></i>
+                                <span class="vote-count" id="count-dislike"><?= $dislikes ?></span>
+                            </button>
+                        </div>
+                        <?php $total = $likes + $dislikes; $likePercent = $total > 0 ? round($likes / $total * 100) : 50; ?>
+                        <div class="vote-bar-wrap" id="vote-bar-wrap" <?= $total === 0 ? 'style="display:none"' : '' ?>>
+                            <div class="vote-bar-bg">
+                                <div class="vote-bar-fill" id="vote-bar" style="width: <?= $likePercent ?>%"></div>
+                            </div>
+                            <div class="vote-bar-labels">
+                                <span id="like-pct"><?= $likePercent ?>% positivo</span>
+                                <span id="total-votes"><?= $total ?> voto<?= $total !== 1 ? 's' : '' ?></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Comments -->
                     <div class="comments-section" id="comentarios">
                         <h3><i class="bi bi-chat-dots me-2"></i>Comentarios (<?= $commentCount ?>)</h3>
@@ -324,5 +405,45 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.querySelectorAll('.vote-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var vote = this.dataset.vote;
+            var url = this.dataset.url;
+            var allBtns = document.querySelectorAll('.vote-btn');
+            allBtns.forEach(function(b) { b.disabled = true; });
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'vote=' + encodeURIComponent(vote)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                document.getElementById('count-like').textContent = data.likes;
+                document.getElementById('count-dislike').textContent = data.dislikes;
+
+                document.querySelector('.like-btn').classList.toggle('active', data.myVote === 'like');
+                document.querySelector('.dislike-btn').classList.toggle('active', data.myVote === 'dislike');
+
+                var total = data.likes + data.dislikes;
+                var pct = total > 0 ? Math.round(data.likes / total * 100) : 50;
+                var wrap = document.getElementById('vote-bar-wrap');
+                if (total > 0) {
+                    wrap.style.display = '';
+                    document.getElementById('vote-bar').style.width = pct + '%';
+                    document.getElementById('like-pct').textContent = pct + '% positivo';
+                    document.getElementById('total-votes').textContent = total + ' voto' + (total !== 1 ? 's' : '');
+                } else {
+                    wrap.style.display = 'none';
+                }
+            })
+            .finally(function() {
+                allBtns.forEach(function(b) { b.disabled = false; });
+            });
+        });
+    });
+    </script>
 </body>
 </html>

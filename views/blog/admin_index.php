@@ -24,6 +24,7 @@
                             <th>Título</th>
                             <th>Estado</th>
                             <th>Comentarios</th>
+                            <th>Votos</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
@@ -44,6 +45,10 @@
                             </td>
                             <td>
                                 <span class="badge bg-info"><?= $post['comment_count'] ?></span>
+                            </td>
+                            <td>
+                                <span class="text-success fw-semibold"><i class="bi bi-hand-thumbs-up-fill"></i> <?= $post['likes'] ?></span>
+                                <span class="text-danger fw-semibold ms-2"><i class="bi bi-hand-thumbs-down-fill"></i> <?= $post['dislikes'] ?></span>
                             </td>
                             <td class="small"><?= date('d/m/Y H:i', strtotime($post['created_at'])) ?></td>
                             <td>

@@ -14,6 +14,7 @@ class BlogController
     public function publicIndex(): void
     {
         $pdo = Database::master();
+
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 6;
         $offset = ($page - 1) * $perPage;
@@ -47,17 +48,86 @@ class BlogController
             return;
         }
 
-        $commentsStmt = $pdo->prepare("SELECT * FROM blog_comments WHERE post_id = :id AND aprobado = 1 ORDER BY created_at DESC");
+        $commentsStmt = $pdo->prepare("SELECT * FROM blog_comments WHERE post_id = :id AND aprobado = 1 ORDER BY created_at ASC");
         $commentsStmt->execute(['id' => $post['id']]);
         $comments = $commentsStmt->fetchAll();
 
         $commentCount = count($comments);
 
+        $votesStmt = $pdo->prepare("SELECT vote, COUNT(*) as total FROM blog_post_votes WHERE post_id = :id GROUP BY vote");
+        $votesStmt->execute(['id' => $post['id']]);
+        $votesRaw = $votesStmt->fetchAll();
+        $likes = 0; $dislikes = 0;
+        foreach ($votesRaw as $v) {
+            if ($v['vote'] === 'like') $likes = (int)$v['total'];
+            if ($v['vote'] === 'dislike') $dislikes = (int)$v['total'];
+        }
+
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $ip = trim(explode(',', $ip)[0]);
+        $myVoteStmt = $pdo->prepare("SELECT vote FROM blog_post_votes WHERE post_id = :id AND ip_address = :ip");
+        $myVoteStmt->execute(['id' => $post['id'], 'ip' => $ip]);
+        $myVote = $myVoteStmt->fetchColumn() ?: null;
+
         view('blog.public_show', [
             'post' => $post,
             'comments' => $comments,
             'commentCount' => $commentCount,
+            'likes' => $likes,
+            'dislikes' => $dislikes,
+            'myVote' => $myVote,
         ]);
+    }
+
+    public function vote(string $slug): void
+    {
+        header('Content-Type: application/json');
+        $pdo = Database::master();
+
+        $stmt = $pdo->prepare("SELECT id FROM blog_posts WHERE slug = :slug AND publicado = 1");
+        $stmt->execute(['slug' => $slug]);
+        $post = $stmt->fetch();
+
+        if (!$post) {
+            echo json_encode(['error' => 'Post not found']);
+            return;
+        }
+
+        $vote = $_POST['vote'] ?? '';
+        if (!in_array($vote, ['like', 'dislike'])) {
+            echo json_encode(['error' => 'Invalid vote']);
+            return;
+        }
+
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $ip = trim(explode(',', $ip)[0]);
+
+        $existing = $pdo->prepare("SELECT vote FROM blog_post_votes WHERE post_id = :id AND ip_address = :ip");
+        $existing->execute(['id' => $post['id'], 'ip' => $ip]);
+        $current = $existing->fetchColumn();
+
+        if ($current === $vote) {
+            $pdo->prepare("DELETE FROM blog_post_votes WHERE post_id = :id AND ip_address = :ip")
+                ->execute(['id' => $post['id'], 'ip' => $ip]);
+        } else {
+            $pdo->prepare("INSERT INTO blog_post_votes (post_id, ip_address, vote) VALUES (:id, :ip, :vote)
+                           ON DUPLICATE KEY UPDATE vote = :vote2")
+                ->execute(['id' => $post['id'], 'ip' => $ip, 'vote' => $vote, 'vote2' => $vote]);
+        }
+
+        $counts = $pdo->prepare("SELECT vote, COUNT(*) as total FROM blog_post_votes WHERE post_id = :id GROUP BY vote");
+        $counts->execute(['id' => $post['id']]);
+        $likes = 0; $dislikes = 0;
+        foreach ($counts->fetchAll() as $v) {
+            if ($v['vote'] === 'like') $likes = (int)$v['total'];
+            if ($v['vote'] === 'dislike') $dislikes = (int)$v['total'];
+        }
+
+        $myVoteStmt = $pdo->prepare("SELECT vote FROM blog_post_votes WHERE post_id = :id AND ip_address = :ip");
+        $myVoteStmt->execute(['id' => $post['id'], 'ip' => $ip]);
+        $myVote = $myVoteStmt->fetchColumn() ?: null;
+
+        echo json_encode(['likes' => $likes, 'dislikes' => $dislikes, 'myVote' => $myVote]);
     }
 
     public function storeComment(string $slug): void
@@ -102,7 +172,7 @@ class BlogController
     public function adminIndex(): void
     {
         $pdo = Database::master();
-        $posts = $pdo->query("SELECT bp.*, (SELECT COUNT(*) FROM blog_comments bc WHERE bc.post_id = bp.id) as comment_count FROM blog_posts bp ORDER BY bp.created_at DESC")->fetchAll();
+        $posts = $pdo->query("SELECT bp.*, (SELECT COUNT(*) FROM blog_comments bc WHERE bc.post_id = bp.id) as comment_count, (SELECT COUNT(*) FROM blog_post_votes bv WHERE bv.post_id = bp.id AND bv.vote = 'like') as likes, (SELECT COUNT(*) FROM blog_post_votes bv2 WHERE bv2.post_id = bp.id AND bv2.vote = 'dislike') as dislikes FROM blog_posts bp ORDER BY bp.created_at DESC")->fetchAll();
         view('blog.admin_index', ['posts' => $posts]);
     }
 

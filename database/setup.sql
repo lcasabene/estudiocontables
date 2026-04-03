@@ -196,6 +196,16 @@ CREATE TABLE IF NOT EXISTS `blog_comments` (
     FOREIGN KEY (`post_id`) REFERENCES `blog_posts`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `blog_post_votes` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `post_id` INT NOT NULL,
+    `ip_address` VARCHAR(45) NOT NULL,
+    `vote` ENUM('like','dislike') NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `uq_post_ip` (`post_id`, `ip_address`),
+    FOREIGN KEY (`post_id`) REFERENCES `blog_posts`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Usuario admin (password: admin123)
 INSERT INTO `usuarios` (`nombre_completo`, `email`, `password_hash`, `rol`) VALUES
 ('Administrador', 'admin@estudio.com', '$2y$10$hRl/ZFvKADVk2LvpYCtmnu5ecXpDYUsTxkbKKpAp0/X0AJoMv3o0C', 'admin');

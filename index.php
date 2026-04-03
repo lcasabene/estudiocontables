@@ -73,6 +73,15 @@ Router::get('/', function () {
     view('home');
 });
 
+// Home v2 (preview)
+Router::get('/home1', function () {
+    $pdo = Core\Database::master();
+    $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE publicado = 1 ORDER BY created_at DESC LIMIT 3");
+    $stmt->execute();
+    $recent_posts = $stmt->fetchAll();
+    view('home1', ['recent_posts' => $recent_posts]);
+});
+
 // --- BLOG PÚBLICO (must be before /{slug}/... routes) ---
 Router::get('/blog', function () {
     $controller = new Controllers\BlogController();
@@ -87,6 +96,11 @@ Router::get('/blog/{postSlug}', function (string $postSlug) {
 Router::post('/blog/{postSlug}/comentar', function (string $postSlug) {
     $controller = new Controllers\BlogController();
     $controller->storeComment($postSlug);
+});
+
+Router::post('/blog/{postSlug}/votar', function (string $postSlug) {
+    $controller = new Controllers\BlogController();
+    $controller->vote($postSlug);
 });
 
 // Tenant routes: /{slug}/...
