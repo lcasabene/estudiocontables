@@ -154,9 +154,9 @@ CREATE TABLE IF NOT EXISTS `audit_log` (
 -- DATOS INICIALES
 -- =============================================
 
--- Estudio Contable Casabene (apunta a la misma base de datos)
+-- Luis Ariel Casabene (apunta a la misma base de datos)
 INSERT INTO `estudios` (`nombre`, `slug`, `activo`) VALUES
-('Estudio Contable Casabene', 'estudio', 1);
+('Luis Ariel Casabene', 'estudio', 1);
 
 -- IMPORTANTE: db_name apunta a la misma DB unificada
 INSERT INTO `estudio_db` (`estudio_id`, `db_host`, `db_name`, `db_user`, `db_pass`) VALUES

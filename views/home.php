@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador Ariel Casabene - Estudio Contable</title>
-    <meta name="description" content="Estudio Contable Casabene. Contador Público Nacional. Servicios contables, impositivos y laborales en Argentina.">
+    <title>Luis Ariel Casabene - Contador Público</title>
+    <meta name="description" content="Luis Ariel Casabene. Contador Público Nacional. Servicios contables, impositivos y laborales en Argentina.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -530,7 +530,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand navbar-brand-text" href="#">
-                <i class="bi bi-building me-2"></i>Estudio <span>Luis Ariel Casabene</span>
+                <i class="bi bi-building me-2"></i>Luis Ariel <span>Casabene</span>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <i class="bi bi-list text-white fs-4"></i>
@@ -851,7 +851,7 @@
         <div class="container">
             <p class="mb-1">
                 <i class="bi bi-building me-1"></i> 
-                <strong>Estudio Contable Casabene</strong> &mdash; Contador Publico Nacional
+                <strong>Luis Ariel Casabene</strong> &mdash; Contador Publico Nacional
             </p>
             <p class="mb-0 small">
                 &copy; <?= date('Y') ?> Todos los derechos reservados. | 

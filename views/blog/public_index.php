@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog - Entidades Religiosas | Estudio Contable Casabene</title>
+    <title>Blog - Entidades Religiosas | Luis Ariel Casabene</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -136,7 +136,7 @@
     <nav class="blog-nav">
         <div class="container d-flex justify-content-between align-items-center">
             <a href="<?= base_url('/') ?>" class="brand">
-                <i class="bi bi-building"></i>Estudio <span>Casabene</span>
+                <i class="bi bi-building"></i>Luis Ariel <span>Casabene</span>
             </a>
             <div class="d-flex gap-3 align-items-center">
                 <a href="<?= base_url('/') ?>" class="nav-link-custom">Inicio</a>
@@ -209,7 +209,7 @@
     <!-- Footer -->
     <footer class="blog-footer">
         <div class="container">
-            <p>&copy; <?= date('Y') ?> Estudio Contable Casabene. <a href="<?= base_url('/') ?>">Volver al inicio</a></p>
+            <p>&copy; <?= date('Y') ?> Luis Ariel Casabene. <a href="<?= base_url('/') ?>">Volver al inicio</a></p>
         </div>
     </footer>
 
