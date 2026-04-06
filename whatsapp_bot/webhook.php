@@ -7,10 +7,10 @@
 $verify_token = 'estudio_casabene_2026'; 
 
 // 2. TOKEN DE ACCESO (Copia el temporal o el permanente de Meta)
-$access_token = 'TU_NUEVO_ACCESS_TOKEN_AQUÍ';
+$access_token = 'EAAb2mASZCnz4BRCG25tFDsU9M3gj7HNm42WFJUDDvHTiFfRAv8jNrUb6QsJMZBfv8qYvpZAwukm0Mv5ZCHdT76nbgzleGFJ0EMq8kf2fUZBi64HPUTsc9ZALY7wjyggO3xaCMKTkFN1EUyVUPfgSQXRhhvv9sNf53FNB7AG9v47gw66IIQHh5ZBRz6pyZBL6zAZDZD';
 
 // 3. ID DEL NÚMERO DE TELÉFONO (El nuevo Phone Number ID de esta App)
-$phone_id = 'TU_NUEVO_PHONE_NUMBER_ID_AQUÍ';
+$phone_id = '1019236997942935';
 
 // ==========================================
 // 1. VERIFICACIÓN DEL WEBHOOK (Método GET)
