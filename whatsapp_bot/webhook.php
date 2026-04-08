@@ -54,14 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
         $message = $data['entry'][0]['changes'][0]['value']['messages'][0];
-        $from = $message['from'];
-
-        // Argentina: WhatsApp envía 542995743759 (12 dígitos) pero para responder
-        // se necesita 54299155743759 (insertar "15" después de 54 + código de área)
-        if (substr($from, 0, 2) === '54' && strlen($from) === 12) {
-            $from = substr($from, 0, 5) . '15' . substr($from, 5);
-        }
-
+        $from = normalizar_numero($message['from']);
         wlog('Número normalizado', $from);
 
         $type = $message['type'];
@@ -83,6 +76,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         wlog('Sin mensaje en payload', $data);
     }
+}
+
+// =====================================================
+// FUNCIONES
+// =====================================================
+
+function normalizar_numero(string $numero): string
+{
+    // Limpiar todo lo que no sea dígito
+    $numero = preg_replace('/\D+/', '', $numero);
+
+    // Argentina: Meta devuelve 549XXXXXXXXX (13 dígitos)
+    // Necesita enviarse como 54299XXXXXXXX (14 dígitos)
+    // Ejemplo: 5492995743759 → 54299155743759
+    if (strlen($numero) === 13 && str_starts_with($numero, '549')) {
+        $area   = substr($numero, 3, 3); // ej: 299
+        $resto  = substr($numero, 6);    // ej: 5743759
+        $numero = '54' . $area . '15' . $resto;
+    }
+
+    return $numero;
 }
 
 // ==========================================
