@@ -7,7 +7,7 @@
 $verify_token = 'estudio_casabene_2026'; 
 
 // 2. TOKEN DE ACCESO (Copia el temporal o el permanente de Meta)
-$access_token = 'EAAb2mASZCnz4BRCG25tFDsU9M3gj7HNm42WFJUDDvHTiFfRAv8jNrUb6QsJMZBfv8qYvpZAwukm0Mv5ZCHdT76nbgzleGFJ0EMq8kf2fUZBi64HPUTsc9ZALY7wjyggO3xaCMKTkFN1EUyVUPfgSQXRhhvv9sNf53FNB7AG9v47gw66IIQHh5ZBRz6pyZBL6zAZDZD';
+$access_token = 'EAAb2mASZCnz4BRMP1nfJHOeAKTS1OsyT15knNc7773bf2FPbS6c0TnPnmNHO2Mfp4UZBvphJ4UpJZCrqoNzZCrn7zXdR6jrkmh3SJofAXSLiZBG6C0bvHgLfXSCqb4wviatiZAgTLT1TcEBkV2GAKvVAhcXeIJJwuOSFk0ipIgvMprHVHcxoPZAZCmNULQriDxobmmFFMfOqbNAWeymYkrZB7imzpHycWmMIE6W7PjjCnv5Pu17sY2hA5uZB9vpTiTtmYSvGYnbpLM4UZBQF1i9hN79';
 
 // 3. ID DEL NÚMERO DE TELÉFONO (El nuevo Phone Number ID de esta App)
 $phone_id = '1019236997942935';
@@ -54,7 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
         $message = $data['entry'][0]['changes'][0]['value']['messages'][0];
-        $from = $message['from']; 
+        $from = $message['from'];
+
+        // Argentina: WhatsApp envía 542995743759 (12 dígitos) pero para responder
+        // se necesita 54299155743759 (insertar "15" después de 54 + código de área)
+        if (substr($from, 0, 2) === '54' && strlen($from) === 12) {
+            $from = substr($from, 0, 5) . '15' . substr($from, 5);
+        }
+
+        wlog('Número normalizado', $from);
+
         $type = $message['type'];
 
         wlog('Mensaje recibido', ['from' => $from, 'type' => $type, 'msg' => $message]);
