@@ -7,7 +7,7 @@
 $verify_token = 'estudio_casabene_2026'; 
 
 // 2. TOKEN DE ACCESO (Copia el temporal o el permanente de Meta)
-$access_token = 'EAAb2mASZCnz4BRMP1nfJHOeAKTS1OsyT15knNc7773bf2FPbS6c0TnPnmNHO2Mfp4UZBvphJ4UpJZCrqoNzZCrn7zXdR6jrkmh3SJofAXSLiZBG6C0bvHgLfXSCqb4wviatiZAgTLT1TcEBkV2GAKvVAhcXeIJJwuOSFk0ipIgvMprHVHcxoPZAZCmNULQriDxobmmFFMfOqbNAWeymYkrZB7imzpHycWmMIE6W7PjjCnv5Pu17sY2hA5uZB9vpTiTtmYSvGYnbpLM4UZBQF1i9hN79';
+$access_token = 'EAAb2mASZCnz4BRAQDCN3GmBe0ED388mtcZAa8AzSQZCqjqx0WgkXPSSnaYPy9nfo97x0XgZBo0YZCEA90ADwLVhkBTOHl59mFZC6yFCVUZB4ZBtgmdIYf36CxaWOPPrcdsFMZB8uR1MF8NjelRrD0XnzZCp0ZAaFimu6QJ0XhGnFf0iNq5k5SN0X0fRNJv3ZAbEJKQ5h9UwunBTMZBmGoFEZB0mkrZCJc5TfuqdhsA1tzAWf5yxxY3haZAsGCtEayP00pJ9z3OZAutSSegb9nttBaeduHFso5';
 
 // 3. ID DEL NÚMERO DE TELÉFONO (El nuevo Phone Number ID de esta App)
 $phone_id = '1019236997942935';
