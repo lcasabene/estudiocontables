@@ -7,10 +7,10 @@
 $verify_token = 'estudio_casabene_2026'; 
 
 // 2. TOKEN DE ACCESO (Copia el temporal o el permanente de Meta)
-$access_token = 'EAAb2mASZCnz4BRAQDCN3GmBe0ED388mtcZAa8AzSQZCqjqx0WgkXPSSnaYPy9nfo97x0XgZBo0YZCEA90ADwLVhkBTOHl59mFZC6yFCVUZB4ZBtgmdIYf36CxaWOPPrcdsFMZB8uR1MF8NjelRrD0XnzZCp0ZAaFimu6QJ0XhGnFf0iNq5k5SN0X0fRNJv3ZAbEJKQ5h9UwunBTMZBmGoFEZB0mkrZCJc5TfuqdhsA1tzAWf5yxxY3haZAsGCtEayP00pJ9z3OZAutSSegb9nttBaeduHFso5';
+$access_token = 'EAAb2mASZCnz4BRCG25tFDsU9M3gj7HNm42WFJUDDvHTiFfRAv8jNrUb6QsJMZBfv8qYvpZAwukm0Mv5ZCHdT76nbgzleGFJ0EMq8kf2fUZBi64HPUTsc9ZALY7wjyggO3xaCMKTkFN1EUyVUPfgSQXRhhvv9sNf53FNB7AG9v47gw66IIQHh5ZBRz6pyZBL6zAZDZD';
 
 // 3. ID DEL NÚMERO DE TELÉFONO (El nuevo Phone Number ID de esta App)
-$phone_id = '1019236997942935';
+$phone_id = '1093325610527041';
 
 // ==========================================
 // LOG LOCAL
