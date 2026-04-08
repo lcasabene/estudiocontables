@@ -13,6 +13,19 @@ $access_token = 'EAAb2mASZCnz4BRCG25tFDsU9M3gj7HNm42WFJUDDvHTiFfRAv8jNrUb6QsJMZB
 $phone_id = '1019236997942935';
 
 // ==========================================
+// LOG LOCAL
+// ==========================================
+function wlog($label, $data = null) {
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
+    if ($data !== null) {
+        $line .= ' | ' . (is_string($data) ? $data : json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+    file_put_contents(__DIR__ . '/webhook.log', $line . PHP_EOL, FILE_APPEND);
+}
+
+wlog($_SERVER['REQUEST_METHOD'] . ' request', $_SERVER['REQUEST_URI'] ?? '');
+
+// ==========================================
 // 1. VERIFICACIÓN DEL WEBHOOK (Método GET)
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -34,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 
+    wlog('POST payload', $input);
+
     // Respondemos 200 OK rápido a Meta
     http_response_code(200);
 
@@ -42,16 +57,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $from = $message['from']; 
         $type = $message['type'];
 
+        wlog('Mensaje recibido', ['from' => $from, 'type' => $type, 'msg' => $message]);
+
         // Si recibimos un texto (ej: "Hola")
         if ($type === 'text') {
+            wlog('Acción', 'enviando menu a ' . $from);
             enviar_menu_contable($from, $access_token, $phone_id);
         }
         
         // Si el usuario elige una opción del menú
         if ($type === 'interactive') {
             $option_id = $message['interactive']['list_reply']['id'];
+            wlog('Acción', 'opcion seleccionada: ' . $option_id . ' por ' . $from);
             procesar_seleccion($from, $option_id, $access_token, $phone_id);
         }
+    } else {
+        wlog('Sin mensaje en payload', $data);
     }
 }
 
@@ -115,6 +136,8 @@ function enviar_peticion($url, $token, $json) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer $token", "Content-Type: application/json"]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_exec($ch);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+    wlog('API response HTTP ' . $httpCode, $response);
 }
