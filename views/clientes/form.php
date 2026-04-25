@@ -240,8 +240,17 @@ ob_start();
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
-                                <form method="POST" action="<?= tenant_url("clientes/{$cliente['id']}/exenciones/{$ex['id']}/delete") ?>" onsubmit="return confirm('¿Eliminar esta exención?')">
+                            <td class="text-nowrap">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#editExencionModal"
+                                    data-id="<?= $ex['id'] ?>"
+                                    data-impuesto="<?= $ex['impuesto_id'] ?>"
+                                    data-desde="<?= $ex['fecha_desde'] ?? '' ?>"
+                                    data-hasta="<?= $ex['fecha_hasta'] ?? '' ?>"
+                                    data-obs="<?= e($ex['observaciones'] ?? '') ?>">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form method="POST" action="<?= tenant_url("clientes/{$cliente['id']}/exenciones/{$ex['id']}/delete") ?>" onsubmit="return confirm('¿Eliminar esta exención?')" class="d-inline">
                                     <?= csrf_field() ?>
                                     <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
                                 </form>
@@ -285,5 +294,65 @@ ob_start();
     </div>
 </div>
 
+<?php if ($isEdit): ?>
+<!-- Modal editar exención -->
+<div class="modal fade" id="editExencionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="editExencionForm" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil"></i> Editar Exención</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Impuesto *</label>
+                        <select name="impuesto_id" id="edit_impuesto_id" class="form-select" required>
+                            <option value="">-- Seleccionar --</option>
+                            <?php foreach ($impuestos as $imp): ?>
+                                <option value="<?= $imp['id'] ?>"><?= e($imp['nombre']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Desde</label>
+                            <input type="date" name="fecha_desde" id="edit_fecha_desde" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Hasta</label>
+                            <input type="date" name="fecha_hasta" id="edit_fecha_hasta" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Observaciones</label>
+                        <input type="text" name="observaciones" id="edit_observaciones" class="form-control">
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Reemplazar archivo (opcional)</label>
+                        <input type="file" name="archivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('editExencionModal').addEventListener('show.bs.modal', function (e) {
+    var btn  = e.relatedTarget;
+    var base = '<?= tenant_url("clientes/{$cliente['id']}/exenciones/") ?>';
+    document.getElementById('editExencionForm').action         = base + btn.dataset.id + '/update';
+    document.getElementById('edit_impuesto_id').value          = btn.dataset.impuesto;
+    document.getElementById('edit_fecha_desde').value          = btn.dataset.desde;
+    document.getElementById('edit_fecha_hasta').value          = btn.dataset.hasta;
+    document.getElementById('edit_observaciones').value        = btn.dataset.obs;
+});
+</script>
+<?php endif; ?>
 
 <?php $content = ob_get_clean(); require __DIR__ . '/../layouts/app.php'; ?>

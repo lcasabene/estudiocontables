@@ -73,6 +73,77 @@ class ExencionController
         redirect(tenant_url("clientes/{$clienteId}/editar") . '#exenciones');
     }
 
+    public function update(int $clienteId, int $exencionId): void
+    {
+        $pdo = Database::tenant();
+
+        $impuestoId = (int)($_POST['impuesto_id'] ?? 0);
+        $fechaDesde = trim($_POST['fecha_desde'] ?? '') ?: null;
+        $fechaHasta = trim($_POST['fecha_hasta'] ?? '') ?: null;
+        $observaciones = trim($_POST['observaciones'] ?? '') ?: null;
+
+        if (!$impuestoId) {
+            Session::flash('error', 'Debe seleccionar un impuesto.');
+            redirect(tenant_url("clientes/{$clienteId}/editar") . '#exenciones');
+            return;
+        }
+
+        // Verify the exemption belongs to this client
+        $check = $pdo->prepare("SELECT id, archivo FROM exenciones WHERE id = :id AND cliente_id = :cliente_id AND activo = 1");
+        $check->execute(['id' => $exencionId, 'cliente_id' => $clienteId]);
+        $exencion = $check->fetch();
+
+        if (!$exencion) {
+            Session::flash('error', 'Exención no encontrada.');
+            redirect(tenant_url("clientes/{$clienteId}/editar") . '#exenciones');
+            return;
+        }
+
+        $archivo = $exencion['archivo'];
+
+        if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['archivo'];
+
+            if (!is_dir($this->uploadDir . $clienteId)) {
+                mkdir($this->uploadDir . $clienteId, 0755, true);
+            }
+
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowed = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+
+            if (!in_array($ext, $allowed)) {
+                Session::flash('error', 'Tipo de archivo no permitido.');
+                redirect(tenant_url("clientes/{$clienteId}/editar") . '#exenciones');
+                return;
+            }
+
+            $filename = uniqid('exen_') . '.' . $ext;
+            $dest = $this->uploadDir . $clienteId . '/' . $filename;
+
+            if (move_uploaded_file($file['tmp_name'], $dest)) {
+                $archivo = 'exenciones/' . $clienteId . '/' . $filename;
+            }
+        }
+
+        $stmt = $pdo->prepare("UPDATE exenciones SET impuesto_id = :impuesto_id, fecha_desde = :fecha_desde,
+                               fecha_hasta = :fecha_hasta, archivo = :archivo, observaciones = :observaciones,
+                               updated_at = NOW()
+                               WHERE id = :id AND cliente_id = :cliente_id");
+        $stmt->execute([
+            'impuesto_id'   => $impuestoId,
+            'fecha_desde'   => $fechaDesde,
+            'fecha_hasta'   => $fechaHasta,
+            'archivo'       => $archivo,
+            'observaciones' => $observaciones,
+            'id'            => $exencionId,
+            'cliente_id'    => $clienteId,
+        ]);
+
+        Audit::log('editar', 'exenciones', $exencionId);
+        Session::flash('success', 'Exención actualizada correctamente.');
+        redirect(tenant_url("clientes/{$clienteId}/editar") . '#exenciones');
+    }
+
     public function delete(int $clienteId, int $exencionId): void
     {
         $pdo = Database::tenant();

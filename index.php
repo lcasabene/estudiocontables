@@ -267,6 +267,14 @@ Router::post('/{slug}/clientes/{id}/exenciones/store', function (string $slug, s
     $controller->store((int)$id);
 });
 
+Router::post('/{slug}/clientes/{id}/exenciones/{exId}/update', function (string $slug, string $id, string $exId) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin', 'empleado');
+    CSRF::check();
+    $controller = new Controllers\ExencionController();
+    $controller->update((int)$id, (int)$exId);
+});
+
 Router::post('/{slug}/clientes/{id}/exenciones/{exId}/delete', function (string $slug, string $id, string $exId) {
     if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
     Core\Auth::requireRole($slug, 'admin', 'empleado');
