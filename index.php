@@ -258,7 +258,52 @@ Router::post('/{slug}/condiciones-fiscales/{id}/delete', function (string $slug,
     $controller->delete((int)$id);
 });
 
+// --- CONFIGURACIÓN ---
+Router::get('/{slug}/configuracion', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    view('configuracion.index', ['pageTitle' => 'Configuración']);
+});
+
+Router::get('/{slug}/configuracion/impuestos', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    $controller = new Controllers\ImpuestoController();
+    $controller->index();
+});
+
+Router::post('/{slug}/configuracion/impuestos/store', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\ImpuestoController();
+    $controller->store();
+});
+
+Router::post('/{slug}/configuracion/impuestos/{id}/update', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\ImpuestoController();
+    $controller->update((int)$id);
+});
+
+Router::post('/{slug}/configuracion/impuestos/{id}/delete', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\ImpuestoController();
+    $controller->delete((int)$id);
+});
+
 // --- EXENCIONES ---
+Router::get('/{slug}/exenciones/vencimientos', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin', 'empleado');
+    $controller = new Controllers\ExencionController();
+    $controller->vencimientos();
+});
+
 Router::post('/{slug}/clientes/{id}/exenciones/store', function (string $slug, string $id) {
     if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
     Core\Auth::requireRole($slug, 'admin', 'empleado');

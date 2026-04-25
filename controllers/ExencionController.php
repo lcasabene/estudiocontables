@@ -16,6 +16,48 @@ class ExencionController
         $this->uploadDir = __DIR__ . '/../storage/uploads/' . (Tenant::slug() ?? 'default') . '/exenciones/';
     }
 
+    public function vencimientos(): void
+    {
+        $pdo = Database::tenant();
+
+        $dias = (int)($_GET['dias'] ?? 60);
+        if (!in_array($dias, [30, 60, 90, 180, 0])) {
+            $dias = 60;
+        }
+
+        if ($dias === 0) {
+            // Todas las exenciones activas
+            $stmt = $pdo->query("SELECT ex.*, imp.nombre as impuesto_nombre,
+                                        c.razon_social, c.cuit,
+                                        DATEDIFF(ex.fecha_hasta, CURDATE()) as dias_restantes
+                                 FROM exenciones ex
+                                 JOIN impuestos imp ON ex.impuesto_id = imp.id
+                                 JOIN clientes c ON ex.cliente_id = c.id
+                                 WHERE ex.activo = 1 AND c.activo = 1
+                                 ORDER BY ex.fecha_hasta ASC");
+        } else {
+            $stmt = $pdo->prepare("SELECT ex.*, imp.nombre as impuesto_nombre,
+                                          c.razon_social, c.cuit, c.id as cliente_id_val,
+                                          DATEDIFF(ex.fecha_hasta, CURDATE()) as dias_restantes
+                                   FROM exenciones ex
+                                   JOIN impuestos imp ON ex.impuesto_id = imp.id
+                                   JOIN clientes c ON ex.cliente_id = c.id
+                                   WHERE ex.activo = 1 AND c.activo = 1
+                                     AND ex.fecha_hasta IS NOT NULL
+                                     AND ex.fecha_hasta BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL :dias DAY)
+                                   ORDER BY ex.fecha_hasta ASC");
+            $stmt->execute(['dias' => $dias]);
+        }
+
+        $exenciones = $stmt->fetchAll();
+
+        view('exenciones.index', [
+            'exenciones' => $exenciones,
+            'dias'       => $dias,
+            'pageTitle'  => 'Vencimientos de Exenciones',
+        ]);
+    }
+
     public function store(int $clienteId): void
     {
         $pdo = Database::tenant();
