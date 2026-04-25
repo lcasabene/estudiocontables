@@ -93,9 +93,6 @@ $slug = Tenant::slug();
             <a href="<?= tenant_url('claves-fiscales/todas') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/claves-fiscales') ? 'active' : '' ?>">
                 <i class="bi bi-key"></i> Claves Fiscales
             </a>
-            <a href="<?= tenant_url('condiciones-fiscales') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/condiciones-fiscales') ? 'active' : '' ?>">
-                <i class="bi bi-file-earmark-ruled"></i> Condiciones Fiscales
-            </a>
             <a href="<?= tenant_url('exenciones/vencimientos') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/exenciones/vencimientos') ? 'active' : '' ?>">
                 <i class="bi bi-shield-exclamation"></i> Exenciones
             </a>
@@ -105,6 +102,9 @@ $slug = Tenant::slug();
             <div class="nav-section">Configuración</div>
             <a href="<?= tenant_url('configuracion') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/configuracion') ? 'active' : '' ?>">
                 <i class="bi bi-gear"></i> Configuración
+            </a>
+            <a href="<?= tenant_url('condiciones-fiscales') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/condiciones-fiscales') ? 'active' : '' ?>">
+                <i class="bi bi-file-earmark-ruled"></i> Condiciones Fiscales
             </a>
             <div class="nav-section">Administración</div>
             <a href="<?= tenant_url('usuarios') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/usuarios') ? 'active' : '' ?>">
