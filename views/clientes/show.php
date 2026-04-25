@@ -27,6 +27,18 @@
                         <label class="text-muted small">Dirección</label>
                         <p><?= $cliente['direccion'] ? e($cliente['direccion']) : '<span class="text-muted">-</span>' ?></p>
                     </div>
+                    <?php if ($cliente['situacion_ib']): ?>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Situación Ingresos Brutos</label>
+                        <p><?= e($cliente['situacion_ib']) ?></p>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($cliente['jurisdiccion_sede']): ?>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Jurisdicción Sede</label>
+                        <p><?= e($cliente['jurisdiccion_sede']) ?></p>
+                    </div>
+                    <?php endif; ?>
                     <?php if ($cliente['url_carpeta_drive']): ?>
                     <div class="col-12">
                         <label class="text-muted small">Carpeta Drive</label>
@@ -36,6 +48,37 @@
                 </div>
             </div>
         </div>
+
+        <?php if (!empty($exenciones)): ?>
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-shield-check"></i> Exenciones</div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>Impuesto</th><th>Desde</th><th>Hasta</th><th>Archivo</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($exenciones as $ex): ?>
+                        <tr>
+                            <td><?= e($ex['impuesto_nombre']) ?></td>
+                            <td><?= $ex['fecha_desde'] ? format_date($ex['fecha_desde']) : '-' ?></td>
+                            <td><?= $ex['fecha_hasta'] ? format_date($ex['fecha_hasta']) : 'Indeterminada' ?></td>
+                            <td>
+                                <?php if ($ex['archivo']): ?>
+                                    <a href="<?= tenant_url("clientes/{$cliente['id']}/exenciones/{$ex['id']}/descargar") ?>" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                        <i class="bi bi-paperclip"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (!empty($historialCF)): ?>
         <div class="card">
@@ -96,6 +139,9 @@
             </a>
             <a href="<?= tenant_url("clientes/{$cliente['id']}/documentos") ?>" class="btn btn-outline-success">
                 <i class="bi bi-folder"></i> Documentos
+            </a>
+            <a href="<?= tenant_url("clientes/{$cliente['id']}/editar") ?>#exenciones" class="btn btn-outline-warning">
+                <i class="bi bi-shield-check"></i> Exenciones
             </a>
             <a href="<?= tenant_url('clientes') ?>" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Volver al listado

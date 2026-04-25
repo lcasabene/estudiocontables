@@ -3,10 +3,9 @@
 -- Ejecutar en phpMyAdmin sobre la BD estudiocontable
 -- =============================================
 
--- 1. Agregar campos de Ingresos Brutos a clientes
-ALTER TABLE `clientes`
-    ADD COLUMN `situacion_ib` ENUM('Convenio Multilateral','Contribuyente Directo') DEFAULT NULL AFTER `url_carpeta_drive`,
-    ADD COLUMN `jurisdiccion_sede` VARCHAR(100) DEFAULT NULL AFTER `situacion_ib`;
+-- 1. Agregar campos de Ingresos Brutos a clientes (ejecutar por separado)
+ALTER TABLE `clientes` ADD COLUMN `situacion_ib` ENUM('Convenio Multilateral','Contribuyente Directo') DEFAULT NULL;
+ALTER TABLE `clientes` ADD COLUMN `jurisdiccion_sede` VARCHAR(100) DEFAULT NULL;
 
 -- 2. Tabla de impuestos
 CREATE TABLE IF NOT EXISTS `impuestos` (

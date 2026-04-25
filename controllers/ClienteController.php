@@ -297,11 +297,21 @@ class ClienteController
         $keyStmt->execute(['id' => $id]);
         $totalClaves = (int)$keyStmt->fetchColumn();
 
+        // Get exenciones
+        $exStmt = $pdo->prepare("SELECT ex.*, imp.nombre as impuesto_nombre
+                                  FROM exenciones ex
+                                  JOIN impuestos imp ON ex.impuesto_id = imp.id
+                                  WHERE ex.cliente_id = :id AND ex.activo = 1
+                                  ORDER BY ex.created_at DESC");
+        $exStmt->execute(['id' => $id]);
+        $exenciones = $exStmt->fetchAll();
+
         view('clientes.show', [
-            'cliente' => $cliente,
+            'cliente'     => $cliente,
             'historialCF' => $historialCF,
-            'totalDocs' => $totalDocs,
+            'totalDocs'   => $totalDocs,
             'totalClaves' => $totalClaves,
+            'exenciones'  => $exenciones,
         ]);
     }
 
