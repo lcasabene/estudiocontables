@@ -156,8 +156,8 @@ class ClienteController
 
         $data = $this->validateInput();
 
-        $stmt = $pdo->prepare("INSERT INTO clientes (razon_social, cuit, email, telefono, direccion, url_carpeta_drive) 
-                               VALUES (:razon_social, :cuit, :email, :telefono, :direccion, :url_carpeta_drive)");
+        $stmt = $pdo->prepare("INSERT INTO clientes (razon_social, cuit, email, telefono, direccion, url_carpeta_drive, situacion_ib, jurisdiccion_sede) 
+                               VALUES (:razon_social, :cuit, :email, :telefono, :direccion, :url_carpeta_drive, :situacion_ib, :jurisdiccion_sede)"  );
         
         try {
             $stmt->execute($data);
@@ -201,6 +201,7 @@ class ClienteController
         }
 
         $condiciones = $pdo->query("SELECT * FROM condiciones_fiscales WHERE activo = 1 ORDER BY nombre")->fetchAll();
+        $impuestos = $pdo->query("SELECT * FROM impuestos WHERE activo = 1 ORDER BY nombre")->fetchAll();
 
         $cfStmt = $pdo->prepare("SELECT ccf.*, cf.nombre as condicion_nombre 
                                   FROM cliente_condicion_fiscal ccf 
@@ -210,10 +211,20 @@ class ClienteController
         $cfStmt->execute(['id' => $id]);
         $historialCF = $cfStmt->fetchAll();
 
+        $exStmt = $pdo->prepare("SELECT ex.*, imp.nombre as impuesto_nombre
+                                  FROM exenciones ex
+                                  JOIN impuestos imp ON ex.impuesto_id = imp.id
+                                  WHERE ex.cliente_id = :id AND ex.activo = 1
+                                  ORDER BY ex.created_at DESC");
+        $exStmt->execute(['id' => $id]);
+        $exenciones = $exStmt->fetchAll();
+
         view('clientes.form', [
-            'cliente' => $cliente,
+            'cliente'    => $cliente,
             'condiciones' => $condiciones,
             'historialCF' => $historialCF,
+            'impuestos'  => $impuestos,
+            'exenciones' => $exenciones,
         ]);
     }
 
@@ -226,6 +237,7 @@ class ClienteController
 
         $stmt = $pdo->prepare("UPDATE clientes SET razon_social = :razon_social, cuit = :cuit, email = :email, 
                                telefono = :telefono, direccion = :direccion, url_carpeta_drive = :url_carpeta_drive,
+                               situacion_ib = :situacion_ib, jurisdiccion_sede = :jurisdiccion_sede,
                                updated_at = NOW() WHERE id = :id AND activo = 1");
         
         try {
@@ -296,12 +308,14 @@ class ClienteController
     private function validateInput(): array
     {
         return [
-            'razon_social' => trim($_POST['razon_social'] ?? ''),
-            'cuit' => trim($_POST['cuit'] ?? ''),
-            'email' => trim($_POST['email'] ?? '') ?: null,
-            'telefono' => trim($_POST['telefono'] ?? '') ?: null,
-            'direccion' => trim($_POST['direccion'] ?? '') ?: null,
+            'razon_social'      => trim($_POST['razon_social'] ?? ''),
+            'cuit'              => trim($_POST['cuit'] ?? ''),
+            'email'             => trim($_POST['email'] ?? '') ?: null,
+            'telefono'          => trim($_POST['telefono'] ?? '') ?: null,
+            'direccion'         => trim($_POST['direccion'] ?? '') ?: null,
             'url_carpeta_drive' => trim($_POST['url_carpeta_drive'] ?? '') ?: null,
+            'situacion_ib'      => trim($_POST['situacion_ib'] ?? '') ?: null,
+            'jurisdiccion_sede' => trim($_POST['jurisdiccion_sede'] ?? '') ?: null,
         ];
     }
 }

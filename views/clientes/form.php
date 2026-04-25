@@ -46,6 +46,31 @@ ob_start();
                                    value="<?= e($cliente['url_carpeta_drive'] ?? old('url_carpeta_drive')) ?>">
                         </div>
 
+                        <?php
+                        $situacionIbVal  = $cliente['situacion_ib'] ?? old('situacion_ib');
+                        $provincias = ['Buenos Aires','Catamarca','Chaco','Chubut','Ciudad Autónoma de Buenos Aires','Córdoba',
+                            'Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones',
+                            'Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe',
+                            'Santiago del Estero','Tierra del Fuego','Tucumán'];
+                        ?>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Situación Ingresos Brutos</label>
+                            <select name="situacion_ib" class="form-select">
+                                <option value="">-- Sin especificar --</option>
+                                <option value="Convenio Multilateral" <?= $situacionIbVal === 'Convenio Multilateral' ? 'selected' : '' ?>>Convenio Multilateral</option>
+                                <option value="Contribuyente Directo" <?= $situacionIbVal === 'Contribuyente Directo' ? 'selected' : '' ?>>Contribuyente Directo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Jurisdicción Sede</label>
+                            <select name="jurisdiccion_sede" class="form-select">
+                                <option value="">-- Sin especificar --</option>
+                                <?php foreach ($provincias as $prov): ?>
+                                    <option value="<?= $prov ?>" <?= ($cliente['jurisdiccion_sede'] ?? old('jurisdiccion_sede')) === $prov ? 'selected' : '' ?>><?= e($prov) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
                         <?php if (!$isEdit && !empty($condiciones)): ?>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Condición Fiscal</label>
@@ -143,6 +168,92 @@ ob_start();
             </div>
         </div>
         <?php endif; ?>
+
+        <?php if ($isEdit): ?>
+        <!-- Exenciones -->
+        <div class="card mb-4" id="exenciones">
+            <div class="card-header">
+                <i class="bi bi-shield-check"></i> Exenciones
+            </div>
+            <div class="card-body">
+                <form method="POST" action="<?= tenant_url("clientes/{$cliente['id']}/exenciones/store") ?>" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Impuesto *</label>
+                            <select name="impuesto_id" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                <?php foreach ($impuestos as $imp): ?>
+                                    <option value="<?= $imp['id'] ?>"><?= e($imp['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Desde</label>
+                            <input type="date" name="fecha_desde" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Hasta</label>
+                            <input type="date" name="fecha_hasta" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Archivo</label>
+                            <input type="file" name="archivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-lg"></i> Agregar
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" name="observaciones" class="form-control" placeholder="Observaciones (opcional)">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <?php if (!empty($exenciones)): ?>
+            <div class="card-body p-0 border-top">
+                <table class="table table-hover mb-0 table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Impuesto</th>
+                            <th>Desde</th>
+                            <th>Hasta</th>
+                            <th>Observaciones</th>
+                            <th>Archivo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($exenciones as $ex): ?>
+                        <tr>
+                            <td><?= e($ex['impuesto_nombre']) ?></td>
+                            <td><?= $ex['fecha_desde'] ? format_date($ex['fecha_desde']) : '-' ?></td>
+                            <td><?= $ex['fecha_hasta'] ? format_date($ex['fecha_hasta']) : 'Indeterminada' ?></td>
+                            <td class="small text-muted"><?= e($ex['observaciones'] ?? '') ?></td>
+                            <td>
+                                <?php if ($ex['archivo']): ?>
+                                    <a href="<?= tenant_url("clientes/{$cliente['id']}/exenciones/{$ex['id']}/descargar") ?>" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                        <i class="bi bi-paperclip"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <form method="POST" action="<?= tenant_url("clientes/{$cliente['id']}/exenciones/{$ex['id']}/delete") ?>" onsubmit="return confirm('¿Eliminar esta exención?')">
+                                    <?= csrf_field() ?>
+                                    <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 
@@ -173,5 +284,6 @@ ob_start();
         </div>
     </div>
 </div>
+
 
 <?php $content = ob_get_clean(); require __DIR__ . '/../layouts/app.php'; ?>

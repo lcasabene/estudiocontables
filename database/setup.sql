@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS `clientes` (
     `telefono` VARCHAR(50) DEFAULT NULL,
     `direccion` TEXT DEFAULT NULL,
     `url_carpeta_drive` VARCHAR(500) DEFAULT NULL,
+    `situacion_ib` ENUM('Convenio Multilateral','Contribuyente Directo') DEFAULT NULL,
+    `jurisdiccion_sede` VARCHAR(100) DEFAULT NULL,
     `activo` TINYINT(1) NOT NULL DEFAULT 1,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -169,6 +171,42 @@ INSERT INTO `condiciones_fiscales` (`nombre`) VALUES
 ('Exento'),
 ('Consumidor Final'),
 ('Sujeto No Categorizado');
+
+-- =============================================
+-- IMPUESTOS Y EXENCIONES
+-- =============================================
+CREATE TABLE IF NOT EXISTS `impuestos` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `nombre` VARCHAR(150) NOT NULL,
+    `activo` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `impuestos` (`nombre`) VALUES
+('Ingresos Brutos'),
+('IVA'),
+('Ganancias'),
+('Bienes Personales'),
+('Monotributo'),
+('Impuesto a los Débitos y Créditos Bancarios'),
+('Impuesto Inmobiliario'),
+('Automotores'),
+('Sellos');
+
+CREATE TABLE IF NOT EXISTS `exenciones` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `cliente_id` INT UNSIGNED NOT NULL,
+    `impuesto_id` INT UNSIGNED NOT NULL,
+    `fecha_desde` DATE DEFAULT NULL,
+    `fecha_hasta` DATE DEFAULT NULL,
+    `archivo` VARCHAR(500) DEFAULT NULL,
+    `observaciones` TEXT DEFAULT NULL,
+    `activo` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`cliente_id`) REFERENCES `clientes`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`impuesto_id`) REFERENCES `impuestos`(`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
 -- BLOG
