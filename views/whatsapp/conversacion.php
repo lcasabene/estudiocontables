@@ -162,7 +162,7 @@ function abrirReenvio(id, body) {
                                     </span>
                                     <?php if (!$esSalida): ?>
                                     <button class="btn btn-outline-warning btn-sm py-0 px-1" style="font-size:.65rem;"
-                                            onclick="abrirReenvio(<?= $m['id'] ?>, <?= json_encode($m['body'] ?? $m['opcion_id'] ?? '') ?>)">
+                                            onclick="abrirReenvio(<?= $m['id'] ?>, <?= htmlspecialchars(json_encode($m['body'] ?? $m['opcion_id'] ?? ''), ENT_QUOTES) ?>)">
                                         <i class="bi bi-share"></i>
                                     </button>
                                     <?php endif; ?>
