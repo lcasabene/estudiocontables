@@ -19,10 +19,11 @@ class UsuarioController
     {
         $pdo = Database::tenant();
 
-        $nombre = trim($_POST['nombre_completo'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $nombre   = trim($_POST['nombre_completo'] ?? '');
+        $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
-        $rol = $_POST['rol'] ?? 'empleado';
+        $rol      = $_POST['rol'] ?? 'empleado';
+        $whatsapp = trim($_POST['whatsapp'] ?? '') ?: null;
 
         if ($nombre === '' || $email === '' || $password === '') {
             Session::flash('error', 'Todos los campos son obligatorios.');
@@ -35,13 +36,14 @@ class UsuarioController
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre_completo, email, password_hash, rol) 
-                                   VALUES (:nombre, :email, :password_hash, :rol)");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre_completo, email, password_hash, rol, whatsapp)
+                                   VALUES (:nombre, :email, :password_hash, :rol, :whatsapp)");
             $stmt->execute([
-                'nombre' => $nombre,
-                'email' => $email,
+                'nombre'        => $nombre,
+                'email'         => $email,
                 'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-                'rol' => $rol,
+                'rol'           => $rol,
+                'whatsapp'      => $whatsapp,
             ]);
 
             $id = (int)$pdo->lastInsertId();
@@ -71,10 +73,11 @@ class UsuarioController
     {
         $pdo = Database::tenant();
 
-        $nombre = trim($_POST['nombre_completo'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $rol = $_POST['rol'] ?? 'empleado';
+        $nombre   = trim($_POST['nombre_completo'] ?? '');
+        $email    = trim($_POST['email'] ?? '');
+        $rol      = $_POST['rol'] ?? 'empleado';
         $password = $_POST['password'] ?? '';
+        $whatsapp = trim($_POST['whatsapp'] ?? '') ?: null;
 
         if ($nombre === '' || $email === '') {
             Session::flash('error', 'Nombre y email son obligatorios.');
@@ -84,23 +87,27 @@ class UsuarioController
 
         try {
             if ($password !== '') {
-                $stmt = $pdo->prepare("UPDATE usuarios SET nombre_completo = :nombre, email = :email, 
-                                       password_hash = :password_hash, rol = :rol, updated_at = NOW() WHERE id = :id AND activo = 1");
+                $stmt = $pdo->prepare("UPDATE usuarios SET nombre_completo = :nombre, email = :email,
+                                       password_hash = :password_hash, rol = :rol, whatsapp = :whatsapp, updated_at = NOW()
+                                       WHERE id = :id AND activo = 1");
                 $stmt->execute([
-                    'nombre' => $nombre,
-                    'email' => $email,
+                    'nombre'        => $nombre,
+                    'email'         => $email,
                     'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-                    'rol' => $rol,
-                    'id' => $id,
+                    'rol'           => $rol,
+                    'whatsapp'      => $whatsapp,
+                    'id'            => $id,
                 ]);
             } else {
-                $stmt = $pdo->prepare("UPDATE usuarios SET nombre_completo = :nombre, email = :email, 
-                                       rol = :rol, updated_at = NOW() WHERE id = :id AND activo = 1");
+                $stmt = $pdo->prepare("UPDATE usuarios SET nombre_completo = :nombre, email = :email,
+                                       rol = :rol, whatsapp = :whatsapp, updated_at = NOW()
+                                       WHERE id = :id AND activo = 1");
                 $stmt->execute([
-                    'nombre' => $nombre,
-                    'email' => $email,
-                    'rol' => $rol,
-                    'id' => $id,
+                    'nombre'   => $nombre,
+                    'email'    => $email,
+                    'rol'      => $rol,
+                    'whatsapp' => $whatsapp,
+                    'id'       => $id,
                 ]);
             }
 

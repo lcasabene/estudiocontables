@@ -26,7 +26,11 @@
                         <option value="cliente">Cliente</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">WhatsApp</label>
+                    <input type="text" name="whatsapp" class="form-control" placeholder="5492991234567">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check-lg"></i> Crear</button>
                 </div>
             </div>
@@ -44,6 +48,7 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
+                        <th>WhatsApp</th>
                         <th>Rol</th>
                         <th>Creado</th>
                         <th>Acciones</th>
@@ -55,6 +60,7 @@
                         <td><?= $u['id'] ?></td>
                         <td class="fw-semibold"><?= e($u['nombre_completo']) ?></td>
                         <td><?= e($u['email']) ?></td>
+                        <td class="small"><?= e($u['whatsapp'] ?? '-') ?></td>
                         <td>
                             <?php 
                             $rolColors = ['admin' => 'danger', 'empleado' => 'primary', 'cliente' => 'success'];
@@ -96,6 +102,10 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Nueva Contraseña</label>
                                                     <input type="password" name="password" class="form-control" placeholder="Dejar vacío para no cambiar">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">WhatsApp <span class="text-muted small">(con código país, sin +)</span></label>
+                                                    <input type="text" name="whatsapp" class="form-control" value="<?= e($u['whatsapp'] ?? '') ?>" placeholder="5492991234567">
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Rol</label>
