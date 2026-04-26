@@ -239,8 +239,9 @@ class WhatsappController
                         [
                             "title" => "Trámites Online",
                             "rows"  => [
-                                ["id" => "btn_constancia_arca",   "title" => "Constancia ARCA",    "description" => "Consultar constancia en AFIP/ARCA"],
-                                ["id" => "btn_constancia_rentas", "title" => "Inscripción Rentas", "description" => "Consultar inscripción en Rentas Nqn"],
+                                ["id" => "btn_constancia_arca",   "title" => "Constancia ARCA",       "description" => "Consultar constancia en AFIP/ARCA"],
+                                ["id" => "btn_constancia_rentas", "title" => "Inscripción Rentas",    "description" => "Consultar inscripción en Rentas Nqn"],
+                                ["id" => "btn_monotributo",       "title" => "Categorías Monotributo","description" => "Ver tabla de categorías AFIP"],
                             ]
                         ]
                     ]

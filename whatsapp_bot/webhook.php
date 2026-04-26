@@ -175,7 +175,8 @@ function enviar_menu_contable($to, $token, $pid) {
                         "title" => "Trámites Online",
                         "rows" => [
                             ["id" => "btn_constancia_arca", "title" => "Constancia ARCA", "description" => "Consultar constancia en AFIP/ARCA"],
-                            ["id" => "btn_constancia_rentas", "title" => "Inscripción Rentas", "description" => "Consultar inscripción en Rentas Nqn"]
+                            ["id" => "btn_constancia_rentas", "title" => "Inscripción Rentas", "description" => "Consultar inscripción en Rentas Nqn"],
+                            ["id" => "btn_monotributo", "title" => "Categorías Monotributo", "description" => "Ver tabla de categorías AFIP"]
                         ]
                     ]
                 ]
@@ -192,7 +193,8 @@ function procesar_seleccion($to, $id, $token, $pid) {
         "btn_doc"               => "Puedes enviar las fotos o PDFs directamente por aquí. Los procesaremos en el día.",
         "btn_humano"            => "Ariel ha sido notificado. Se pondrá en contacto contigo pronto.",
         "btn_constancia_arca"   => "Podés consultar y descargar tu Constancia de Inscripción en ARCA/AFIP desde el siguiente link:\n\nhttps://seti.afip.gob.ar/padron-puc-constancia-internet/ConsultaConstanciaAction.do",
-        "btn_constancia_rentas" => "Podés consultar tu Constancia de Inscripción en Rentas de Neuquén desde el siguiente link:\n\nhttps://rentasneuquenweb.gob.ar/nqn/SCF/cons_inscripcion.php"
+        "btn_constancia_rentas" => "Podés consultar tu Constancia de Inscripción en Rentas de Neuquén desde el siguiente link:\n\nhttps://rentasneuquenweb.gob.ar/nqn/SCF/cons_inscripcion.php",
+        "btn_monotributo"       => "Podés consultar las categorías vigentes del Monotributo en AFIP desde el siguiente link:\n\nhttps://www.afip.gob.ar/monotributo/categorias.asp"
     ];
     $texto = $respuestas[$id] ?? "Opción no válida.";
     enviar_texto($to, $token, $pid, $texto);
