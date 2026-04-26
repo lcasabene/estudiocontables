@@ -7,7 +7,7 @@ $(document).ready(function () {
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
         order: [[0, 'desc']],
         pageLength: 25,
-        columnDefs: [{ orderable: false, targets: 6 }]
+        columnDefs: [{ orderable: false, targets: 5 }]
     });
 
     // Auto-refresh cada 30 segundos
