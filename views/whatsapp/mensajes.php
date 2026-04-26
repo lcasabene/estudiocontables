@@ -51,8 +51,7 @@
         <span><i class="bi bi-chat-dots"></i> Mensajes recibidos</span>
         <div class="d-flex gap-2 align-items-center">
             <span class="badge bg-secondary"><?= count($mensajes) ?></span>
-            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalResponder"
-                    data-numero="" data-nombre="nuevo número">
+            <button class="btn btn-success btn-sm" id="btnMensajeNuevo">
                 <i class="bi bi-plus-lg"></i> Mensaje nuevo
             </button>
         </div>
@@ -101,12 +100,10 @@
                             <?= e(mb_strimwidth($m['body'] ?? '', 0, 80, '…')) ?>
                         <?php endif; ?>
                     </td>
-                    <td class="text-nowrap" onclick="event.stopPropagation()">
-                        <button class="btn btn-success btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#modalResponder"
+                    <td class="text-nowrap">
+                        <button class="btn btn-success btn-sm btn-reply"
                                 data-numero="<?= e($m['from_number']) ?>"
                                 data-nombre="<?= e($m['contact_name'] ?? $m['from_number']) ?>"
-                                onclick="abrirModal(this); event.stopPropagation();"
                                 title="Responder">
                             <i class="bi bi-reply"></i>
                         </button>
@@ -120,29 +117,51 @@
 </div>
 
 <script>
-function abrirModal(el) {
-    var numero = el.dataset.numero;
-    var nombre = el.dataset.nombre;
-    document.getElementById('responderNumero').value        = numero;
-    document.getElementById('responderNumeroDisplay').value = numero;
-    document.getElementById('responderNombre').textContent  = nombre;
-    var modal = new bootstrap.Modal(document.getElementById('modalResponder'));
-    modal.show();
-}
-
-// Mostrar/ocultar campo mensaje según tipo
-document.querySelectorAll('input[name="tipo"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        document.getElementById('campoMensaje').style.display = this.value === 'menu' ? 'none' : '';
-    });
-});
-
 $(document).ready(function () {
     $('#tablaMensajes').DataTable({
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
         order: [[0, 'desc']],
         pageLength: 25,
         columnDefs: [{ orderable: false, targets: 5 }]
+    });
+
+    // Fila clickeable: abrir modal con datos del contacto
+    $('#tablaMensajes tbody').on('click', 'tr', function (e) {
+        if ($(e.target).closest('td').index() === 5) return; // skip columna acción
+        var numero = $(this).data('numero');
+        var nombre = $(this).data('nombre');
+        poblarModal(numero, nombre);
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponder')).show();
+    });
+
+    // Botones reply individuales (la columna de acciones)
+    $('#tablaMensajes tbody').on('click', '.btn-reply', function (e) {
+        e.stopPropagation();
+        poblarModal($(this).data('numero'), $(this).data('nombre'));
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponder')).show();
+    });
+
+    // Botón "Mensaje nuevo"
+    $('#btnMensajeNuevo').on('click', function () {
+        poblarModal('', '');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponder')).show();
+    });
+});
+
+function poblarModal(numero, nombre) {
+    document.getElementById('responderNumero').value        = numero;
+    document.getElementById('responderNumeroDisplay').value = numero;
+    document.getElementById('responderNombre').textContent  = nombre || 'nuevo número';
+    // Resetear tipo a texto
+    document.getElementById('tipoTexto').checked = true;
+    document.getElementById('campoMensaje').style.display = '';
+    document.querySelector('#formResponder textarea').value = '';
+}
+
+// Toggle textarea cuando cambia el tipo
+document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+        document.getElementById('campoMensaje').style.display = this.value === 'menu' ? 'none' : '';
     });
 });
 </script>
