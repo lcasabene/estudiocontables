@@ -26,6 +26,46 @@ function wlog($label, $data = null) {
 wlog($_SERVER['REQUEST_METHOD'] . ' request', $_SERVER['REQUEST_URI'] ?? '');
 
 // ==========================================
+// DB CONNECTION (usa mismas env vars que la app)
+// ==========================================
+function get_db(): ?PDO {
+    static $pdo = null;
+    if ($pdo !== null) return $pdo;
+    try {
+        $host = getenv('DB_HOST') ?: '127.0.0.1';
+        $port = getenv('DB_PORT') ?: '3306';
+        $name = getenv('DB_DATABASE') ?: 'estudiocontable';
+        $user = getenv('DB_USERNAME') ?: 'root';
+        $pass = getenv('DB_PASSWORD') ?: '';
+        $pdo = new PDO("mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4", $user, $pass, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    } catch (Exception $e) {
+        wlog('DB error', $e->getMessage());
+    }
+    return $pdo;
+}
+
+function guardar_mensaje(string $from, string $tipo, ?string $body, ?string $opcionId, ?string $contactName, array $payload): void {
+    $pdo = get_db();
+    if (!$pdo) return;
+    try {
+        $stmt = $pdo->prepare("INSERT INTO whatsapp_mensajes (from_number, contact_name, tipo, body, opcion_id, payload) VALUES (:from, :name, :tipo, :body, :opcion, :payload)");
+        $stmt->execute([
+            'from'    => $from,
+            'name'    => $contactName,
+            'tipo'    => $tipo,
+            'body'    => $body,
+            'opcion'  => $opcionId,
+            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+        ]);
+    } catch (Exception $e) {
+        wlog('DB insert error', $e->getMessage());
+    }
+}
+
+// ==========================================
 // 1. VERIFICACIÓN DEL WEBHOOK (Método GET)
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -58,18 +98,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         wlog('Número normalizado', $from);
 
         $type = $message['type'];
+        $contactName = $data['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name'] ?? null;
 
         wlog('Mensaje recibido', ['from' => $from, 'type' => $type, 'msg' => $message]);
 
         // Si recibimos un texto (ej: "Hola")
         if ($type === 'text') {
+            $body = $message['text']['body'] ?? null;
+            guardar_mensaje($from, 'text', $body, null, $contactName, $message);
             wlog('Acción', 'enviando menu a ' . $from);
             enviar_menu_contable($from, $access_token, $phone_id);
         }
         
         // Si el usuario elige una opción del menú
         if ($type === 'interactive') {
-            $option_id = $message['interactive']['list_reply']['id'];
+            $option_id  = $message['interactive']['list_reply']['id'] ?? null;
+            $option_title = $message['interactive']['list_reply']['title'] ?? $option_id;
+            guardar_mensaje($from, 'interactive', $option_title, $option_id, $contactName, $message);
             wlog('Acción', 'opcion seleccionada: ' . $option_id . ' por ' . $from);
             procesar_seleccion($from, $option_id, $access_token, $phone_id);
         }

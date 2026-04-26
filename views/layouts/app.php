@@ -99,6 +99,10 @@ $slug = Tenant::slug();
             <?php endif; ?>
 
             <?php if (is_admin()): ?>
+            <div class="nav-section">WhatsApp</div>
+            <a href="<?= tenant_url('whatsapp/mensajes') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/whatsapp/') ? 'active' : '' ?>">
+                <i class="bi bi-whatsapp"></i> Mensajes
+            </a>
             <div class="nav-section">Configuración</div>
             <a href="<?= tenant_url('configuracion') ?>" class="<?= str_contains($_SERVER['REQUEST_URI'], '/configuracion') ? 'active' : '' ?>">
                 <i class="bi bi-gear"></i> Configuración

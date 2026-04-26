@@ -258,6 +258,30 @@ Router::post('/{slug}/condiciones-fiscales/{id}/delete', function (string $slug,
     $controller->delete((int)$id);
 });
 
+// --- WHATSAPP PANEL ---
+Router::get('/{slug}/whatsapp/mensajes', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    $controller = new Controllers\WhatsappController();
+    $controller->mensajes();
+});
+
+Router::post('/{slug}/whatsapp/mensajes/{id}/reenviar-menu', function (string $slug, string $id) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\WhatsappController();
+    $controller->reenviarMenu((int)$id);
+});
+
+Router::post('/{slug}/whatsapp/enviar', function (string $slug) {
+    if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
+    Core\Auth::requireRole($slug, 'admin');
+    CSRF::check();
+    $controller = new Controllers\WhatsappController();
+    $controller->enviarTextoManual();
+});
+
 // --- CONFIGURACIÓN ---
 Router::get('/{slug}/configuracion', function (string $slug) {
     if (!Tenant::resolve($slug)) { http_response_code(404); view('errors.404'); return; }
