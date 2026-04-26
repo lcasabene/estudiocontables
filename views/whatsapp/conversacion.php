@@ -32,6 +32,7 @@ function scrollHilo() {
 function abrirReenvio(id, body) {
     document.getElementById('reenvioMensajeId').value = id;
     document.getElementById('reenvioPreview').textContent = body;
+    document.getElementById('formReenvio').action = '<?= tenant_url('whatsapp/mensajes/') ?>' + id + '/reenviar-equipo';
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReenvio')).show();
 }
 </script>
