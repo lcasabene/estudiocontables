@@ -16,6 +16,103 @@ class WhatsappController
         $this->phoneId     = '1093325610527041';
     }
 
+    public function conversacion(string $numero): void
+    {
+        $pdo = Database::tenant();
+
+        $stmt = $pdo->prepare("SELECT * FROM whatsapp_mensajes WHERE from_number = :numero ORDER BY created_at ASC");
+        $stmt->execute(['numero' => $numero]);
+        $mensajes = $stmt->fetchAll();
+
+        $contactName = $mensajes ? ($mensajes[0]['contact_name'] ?? $numero) : $numero;
+
+        // Reenvíos relacionados con este contacto
+        $rstmt = $pdo->prepare("SELECT r.*, m.body, m.opcion_id, m.created_at as msg_fecha
+                                 FROM whatsapp_reenvios r
+                                 JOIN whatsapp_mensajes m ON r.mensaje_id = m.id
+                                 WHERE m.from_number = :numero
+                                 ORDER BY r.created_at DESC LIMIT 50");
+        $rstmt->execute(['numero' => $numero]);
+        $reenvios = $rstmt->fetchAll();
+
+        // Equipo disponible para reenviar
+        $equipo = $pdo->query("SELECT id, nombre_completo, whatsapp FROM usuarios WHERE activo = 1 AND whatsapp IS NOT NULL AND whatsapp != '' ORDER BY nombre_completo")->fetchAll();
+
+        $currentUser = \Core\Auth::user();
+
+        view('whatsapp.conversacion', [
+            'pageTitle'   => "Conversación — {$contactName}",
+            'mensajes'    => $mensajes,
+            'reenvios'    => $reenvios,
+            'equipo'      => $equipo,
+            'numero'      => $numero,
+            'contactName' => $contactName,
+            'currentUser' => $currentUser,
+        ]);
+    }
+
+    public function reenviarAEquipo(int $mensajeId): void
+    {
+        $pdo = Database::tenant();
+
+        $destNumero  = trim($_POST['destinatario_numero'] ?? '');
+        $destNombre  = trim($_POST['destinatario_nombre'] ?? '');
+        $enviadoPor  = trim($_POST['enviado_por'] ?? '');
+        $nota        = trim($_POST['nota'] ?? '') ?: null;
+
+        if (!$destNumero) {
+            Session::flash('error', 'Seleccioná o ingresá un número de destino.');
+            redirect(tenant_url("whatsapp/mensajes/{$mensajeId}/ver"));
+            return;
+        }
+
+        // Buscar el mensaje original
+        $msg = $pdo->prepare("SELECT * FROM whatsapp_mensajes WHERE id = :id");
+        $msg->execute(['id' => $mensajeId]);
+        $row = $msg->fetch();
+
+        if (!$row) {
+            Session::flash('error', 'Mensaje no encontrado.');
+            redirect(tenant_url('whatsapp/mensajes'));
+            return;
+        }
+
+        $contacto = $row['contact_name'] ?: $row['from_number'];
+        $cuerpo   = $row['body'] ?: $row['opcion_id'] ?: '(sin texto)';
+
+        $texto  = "📨 *Mensaje de:* {$contacto} ({$row['from_number']})\n";
+        $texto .= "🕐 " . date('d/m/Y H:i', strtotime($row['created_at'])) . "\n\n";
+        $texto .= $cuerpo;
+        if ($nota) {
+            $texto .= "\n\n📝 *Nota:* {$nota}";
+        }
+        if ($enviadoPor) {
+            $texto .= "\n\n👤 *Enviado por:* {$enviadoPor}";
+        }
+
+        $result = $this->enviarTexto($destNumero, $texto);
+
+        if ($result['status'] === 200) {
+            // Registrar el reenvío
+            $ins = $pdo->prepare("INSERT INTO whatsapp_reenvios (mensaje_id, destinatario_numero, destinatario_nombre, enviado_por, nota) VALUES (:mid, :dnum, :dnombre, :epor, :nota)");
+            $ins->execute([
+                'mid'     => $mensajeId,
+                'dnum'    => $destNumero,
+                'dnombre' => $destNombre ?: null,
+                'epor'    => $enviadoPor ?: null,
+                'nota'    => $nota,
+            ]);
+            $destLabel = $destNombre ?: $destNumero;
+            Session::flash('success', "Mensaje reenviado a {$destLabel}.");
+        } else {
+            $err     = json_decode($result['response'], true);
+            $detalle = $err['error']['message'] ?? $result['response'];
+            Session::flash('error', "Error al reenviar (HTTP {$result['status']}): {$detalle}");
+        }
+
+        redirect(tenant_url("whatsapp/conversacion/{$row['from_number']}"));
+    }
+
     public function mensajes(): void
     {
         $pdo = Database::tenant();

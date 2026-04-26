@@ -147,6 +147,10 @@ document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
                         <?php endif; ?>
                     </td>
                     <td class="text-nowrap" onclick="event.stopPropagation()">
+                        <a href="<?= tenant_url('whatsapp/conversacion/' . urlencode($m['from_number'])) ?>"
+                           class="btn btn-outline-primary btn-sm" title="Ver hilo">
+                            <i class="bi bi-chat-text"></i>
+                        </a>
                         <button class="btn btn-success btn-sm"
                                 data-bs-toggle="modal" data-bs-target="#modalResponder"
                                 data-numero="<?= e($m['from_number']) ?>"
