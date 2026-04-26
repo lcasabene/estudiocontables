@@ -7,8 +7,22 @@ $(document).ready(function () {
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
         order: [[0, 'desc']],
         pageLength: 25,
-        columnDefs: [{ orderable: false, targets: 5 }]
+        columnDefs: [{ orderable: false, targets: 6 }]
     });
+
+    // Auto-refresh cada 30 segundos
+    var t = 30;
+    var el = document.getElementById('refreshCountdown');
+    setInterval(function () {
+        t--;
+        if (el) el.textContent = t;
+        if (t <= 0) location.reload();
+    }, 1000);
+});
+
+// Sincronizar campo número visible → campo oculto
+document.getElementById('responderNumeroDisplay').addEventListener('input', function () {
+    document.getElementById('responderNumero').value = this.value;
 });
 
 // Función global: llamada desde onclick en <tr> (ejecuta cuando el usuario hace click, Bootstrap ya cargó)
@@ -58,7 +72,7 @@ document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Número</label>
-                        <input type="text" id="responderNumeroDisplay" class="form-control" readonly>
+                        <input type="text" id="responderNumeroDisplay" class="form-control" placeholder="Ej: 5492991234567">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tipo de envío</label>
@@ -94,6 +108,7 @@ document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-chat-dots"></i> Mensajes recibidos</span>
         <div class="d-flex gap-2 align-items-center">
+            <span class="text-muted small">Actualiza en <span id="refreshCountdown">30</span>s</span>
             <span class="badge bg-secondary"><?= count($mensajes) ?></span>
             <button class="btn btn-success btn-sm"
                     data-bs-toggle="modal" data-bs-target="#modalResponder"

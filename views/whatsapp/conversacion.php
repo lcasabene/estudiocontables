@@ -3,9 +3,16 @@ ob_start(); // extraJs
 ?>
 <script>
 $(document).ready(function () {
-    // Auto-scroll al final del hilo
-    var hilo = document.getElementById('hiloMensajes');
-    if (hilo) hilo.scrollTop = hilo.scrollHeight;
+    scrollHilo();
+
+    // Auto-refresh cada 20 segundos
+    var refreshTimer = 20;
+    var timerEl = document.getElementById('refreshCountdown');
+    setInterval(function () {
+        refreshTimer--;
+        if (timerEl) timerEl.textContent = refreshTimer;
+        if (refreshTimer <= 0) location.reload();
+    }, 1000);
 
     // Seleccionar miembro del equipo → auto-completar número
     $('#selectEquipo').on('change', function () {
@@ -15,6 +22,11 @@ $(document).ready(function () {
         $('#inputDestNombre').val(nom !== '-- número manual --' ? nom : '');
     });
 });
+
+function scrollHilo() {
+    var hilo = document.getElementById('hiloMensajes');
+    if (hilo) hilo.scrollTop = hilo.scrollHeight;
+}
 
 // Modal reenvío
 function abrirReenvio(id, body) {
@@ -113,43 +125,51 @@ function abrirReenvio(id, body) {
     <!-- Hilo de mensajes -->
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-header"><i class="bi bi-chat-dots"></i> Hilo de conversación</div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-chat-dots"></i> Hilo de conversación</span>
+                <span class="text-muted small">Actualiza en <span id="refreshCountdown">20</span>s</span>
+            </div>
             <div class="card-body p-3" id="hiloMensajes" style="max-height:520px;overflow-y:auto;">
                 <?php if (empty($mensajes)): ?>
                     <p class="text-muted text-center">Sin mensajes.</p>
                 <?php endif; ?>
-                <?php foreach ($mensajes as $m): ?>
-                <div class="mb-3">
-                    <div class="d-flex align-items-start gap-2">
-                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0"
-                             style="width:32px;height:32px;font-size:.75rem;">
-                            <?= mb_strtoupper(mb_substr($contactName, 0, 1)) ?>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="bg-light rounded p-2 small">
-                                <?php if ($m['opcion_id']): ?>
-                                    <span class="badge bg-primary me-1"><?= e($m['opcion_id']) ?></span>
-                                <?php endif; ?>
-                                <?= nl2br(e($m['body'] ?? '')) ?>
+                <?php foreach ($mensajes as $m):
+                    $esSalida = ($m['direccion'] ?? 'entrada') === 'salida';
+                ?>
+                <div class="mb-3 d-flex <?= $esSalida ? 'justify-content-end' : 'justify-content-start' ?>">
+                    <div style="max-width:75%;">
+                        <?php if (!$esSalida): ?>
+                        <div class="d-flex align-items-start gap-2">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:28px;height:28px;font-size:.7rem;">
+                                <?= mb_strtoupper(mb_substr($contactName, 0, 1)) ?>
                             </div>
-                            <div class="d-flex align-items-center gap-2 mt-1">
-                                <span class="text-muted" style="font-size:.7rem;">
-                                    <?= date('d/m/y H:i', strtotime($m['created_at'])) ?>
-                                </span>
-                                <button class="btn btn-outline-warning btn-sm py-0 px-1"
-                                        style="font-size:.7rem;"
-                                        onclick="abrirReenvio(<?= $m['id'] ?>, <?= json_encode($m['body'] ?? $m['opcion_id'] ?? '') ?>)">
-                                    <i class="bi bi-share"></i> Reenviar
-                                </button>
-                                <form method="POST" action="<?= tenant_url("whatsapp/mensajes/{$m['id']}/reenviar-menu") ?>" class="d-inline">
-                                    <?= csrf_field() ?>
-                                    <button class="btn btn-outline-secondary btn-sm py-0 px-1" style="font-size:.7rem;"
-                                            title="Reenviar menú del bot">
-                                        <i class="bi bi-robot"></i> Menú
+                            <div>
+                        <?php endif; ?>
+                                <div class="rounded p-2 small <?= $esSalida ? 'bg-primary text-white' : 'bg-light' ?>">
+                                    <?php if (!$esSalida && $m['opcion_id']): ?>
+                                        <span class="badge bg-secondary me-1"><?= e($m['opcion_id']) ?></span>
+                                    <?php endif; ?>
+                                    <?= nl2br(e($m['body'] ?? '')) ?>
+                                </div>
+                                <div class="d-flex align-items-center gap-1 mt-1 <?= $esSalida ? 'justify-content-end' : '' ?>">
+                                    <span class="text-muted" style="font-size:.65rem;">
+                                        <?= date('d/m/y H:i', strtotime($m['created_at'])) ?>
+                                        <?php if ($esSalida && !empty($m['enviado_por'])): ?>
+                                            · <?= e($m['enviado_por']) ?>
+                                        <?php endif; ?>
+                                    </span>
+                                    <?php if (!$esSalida): ?>
+                                    <button class="btn btn-outline-warning btn-sm py-0 px-1" style="font-size:.65rem;"
+                                            onclick="abrirReenvio(<?= $m['id'] ?>, <?= json_encode($m['body'] ?? $m['opcion_id'] ?? '') ?>)">
+                                        <i class="bi bi-share"></i>
                                     </button>
-                                </form>
+                                    <?php endif; ?>
+                                </div>
+                        <?php if (!$esSalida): ?>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -166,19 +186,21 @@ function abrirReenvio(id, body) {
                 <form method="POST" action="<?= tenant_url('whatsapp/enviar') ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="numero" value="<?= e($numero) ?>">
+                    <input type="hidden" name="origen_numero" value="<?= e($numero) ?>">
                     <input type="hidden" name="tipo" value="texto">
+                    <input type="hidden" name="enviado_por" value="<?= e($currentUser['name'] ?? '') ?>">
                     <textarea name="mensaje" class="form-control form-control-sm mb-2" rows="3"
                               placeholder="Escribí tu respuesta..." required></textarea>
-                    <div class="d-grid gap-1">
-                        <button type="submit" class="btn btn-success btn-sm">
-                            <i class="bi bi-send"></i> Enviar texto
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                        <i class="bi bi-send"></i> Enviar
+                    </button>
                 </form>
                 <form method="POST" action="<?= tenant_url('whatsapp/enviar') ?>" class="mt-2">
                     <?= csrf_field() ?>
                     <input type="hidden" name="numero" value="<?= e($numero) ?>">
+                    <input type="hidden" name="origen_numero" value="<?= e($numero) ?>">
                     <input type="hidden" name="tipo" value="menu">
+                    <input type="hidden" name="enviado_por" value="<?= e($currentUser['name'] ?? '') ?>">
                     <button type="submit" class="btn btn-outline-secondary btn-sm w-100">
                         <i class="bi bi-list-ul"></i> Reenviar menú del bot
                     </button>

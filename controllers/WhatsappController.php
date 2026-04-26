@@ -20,11 +20,19 @@ class WhatsappController
     {
         $pdo = Database::tenant();
 
+        // Mensajes entrantes Y salientes del hilo (from_number = número del contacto en ambos casos)
         $stmt = $pdo->prepare("SELECT * FROM whatsapp_mensajes WHERE from_number = :numero ORDER BY created_at ASC");
         $stmt->execute(['numero' => $numero]);
         $mensajes = $stmt->fetchAll();
 
-        $contactName = $mensajes ? ($mensajes[0]['contact_name'] ?? $numero) : $numero;
+        // contact_name viene de mensajes entrantes
+        $contactName = $numero;
+        foreach ($mensajes as $m) {
+            if ($m['direccion'] === 'entrada' && !empty($m['contact_name'])) {
+                $contactName = $m['contact_name'];
+                break;
+            }
+        }
 
         // Reenvíos relacionados con este contacto
         $rstmt = $pdo->prepare("SELECT r.*, m.body, m.opcion_id, m.created_at as msg_fecha
@@ -169,6 +177,7 @@ class WhatsappController
 
         if ($tipo === 'menu') {
             $result = $this->enviarMenu($numero);
+            $bodyGuardar = '[Menú del bot]';
         } else {
             if (!$mensaje) {
                 Session::flash('error', 'El mensaje no puede estar vacío.');
@@ -176,16 +185,31 @@ class WhatsappController
                 return;
             }
             $result = $this->enviarTexto($numero, $mensaje);
+            $bodyGuardar = $mensaje;
         }
 
+        $enviadoPor = trim($_POST['enviado_por'] ?? '') ?: null;
+        $origen     = trim($_POST['origen_numero'] ?? ''); // número del contacto original si viene de hilo
+
         if ($result['status'] === 200) {
-            Session::flash('success', "Mensaje enviado correctamente a {$numero}.");
+            // Guardar mensaje saliente en el hilo del contacto
+            $numeroHilo = $origen ?: $numero;
+            try {
+                $ins = Database::tenant()->prepare("INSERT INTO whatsapp_mensajes (from_number, contact_name, tipo, direccion, body, enviado_por, leido) VALUES (:num, :cn, 'text', 'salida', :body, :epor, 1)");
+                $ins->execute(['num' => $numeroHilo, 'cn' => $enviadoPor, 'body' => $bodyGuardar, 'epor' => $enviadoPor]);
+            } catch (\Exception $e) { /* columnas aún no migradas */ }
+            Session::flash('success', "Mensaje enviado correctamente.");
         } else {
             $err = json_decode($result['response'], true);
             $detalle = $err['error']['message'] ?? $result['response'];
             Session::flash('error', "Error al enviar (HTTP {$result['status']}): {$detalle}");
         }
-        redirect(tenant_url('whatsapp/mensajes'));
+        // Si viene del hilo, volver al hilo
+        if ($origen) {
+            redirect(tenant_url("whatsapp/conversacion/{$origen}"));
+        } else {
+            redirect(tenant_url('whatsapp/mensajes'));
+        }
     }
 
     private function enviarMenu(string $to): array
