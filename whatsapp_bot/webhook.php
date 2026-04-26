@@ -116,15 +116,24 @@ function enviar_menu_contable($to, $token, $pid) {
             "footer" => ["text" => "Neuquén, Argentina"],
             "action" => [
                 "button" => "Ver servicios",
-                "sections" => [[
-                    "title" => "Consultas Frecuentes",
-                    "rows" => [
-                        ["id" => "btn_vencimientos", "title" => "Ver Vencimientos", "description" => "Próximas fechas AFIP/Rentas"],
-                        ["id" => "btn_factura", "title" => "Solicitar Factura", "description" => "Pedido de honorarios o servicios"],
-                        ["id" => "btn_doc", "title" => "Enviar Documentos", "description" => "Subir fotos de facturas o tickets"],
-                        ["id" => "btn_humano", "title" => "Hablar con Ariel", "description" => "Atención personalizada"]
+                "sections" => [
+                    [
+                        "title" => "Consultas Frecuentes",
+                        "rows" => [
+                            ["id" => "btn_vencimientos", "title" => "Ver Vencimientos", "description" => "Próximas fechas AFIP/Rentas"],
+                            ["id" => "btn_factura", "title" => "Solicitar Factura", "description" => "Pedido de honorarios o servicios"],
+                            ["id" => "btn_doc", "title" => "Enviar Documentos", "description" => "Subir fotos de facturas o tickets"],
+                            ["id" => "btn_humano", "title" => "Hablar con Ariel", "description" => "Atención personalizada"]
+                        ]
+                    ],
+                    [
+                        "title" => "Trámites Online",
+                        "rows" => [
+                            ["id" => "btn_constancia_arca", "title" => "Constancia ARCA", "description" => "Consultar constancia en AFIP/ARCA"],
+                            ["id" => "btn_constancia_rentas", "title" => "Inscripción Rentas", "description" => "Consultar inscripción en Rentas Nqn"]
+                        ]
                     ]
-                ]]
+                ]
             ]
         ]
     ];
@@ -133,10 +142,12 @@ function enviar_menu_contable($to, $token, $pid) {
 
 function procesar_seleccion($to, $id, $token, $pid) {
     $respuestas = [
-        "btn_vencimientos" => "Próximamente te enviaremos el calendario de vencimientos actualizado.",
-        "btn_factura" => "Perfecto. Por favor, indícanos el concepto y te enviaremos la factura a la brevedad.",
-        "btn_doc" => "Puedes enviar las fotos o PDFs directamente por aquí. Los procesaremos en el día.",
-        "btn_humano" => "Ariel ha sido notificado. Se pondrá en contacto contigo pronto."
+        "btn_vencimientos"      => "Próximamente te enviaremos el calendario de vencimientos actualizado.",
+        "btn_factura"           => "Perfecto. Por favor, indícanos el concepto y te enviaremos la factura a la brevedad.",
+        "btn_doc"               => "Puedes enviar las fotos o PDFs directamente por aquí. Los procesaremos en el día.",
+        "btn_humano"            => "Ariel ha sido notificado. Se pondrá en contacto contigo pronto.",
+        "btn_constancia_arca"   => "Podés consultar y descargar tu Constancia de Inscripción en ARCA/AFIP desde el siguiente link:\n\nhttps://seti.afip.gob.ar/padron-puc-constancia-internet/ConsultaConstanciaAction.do",
+        "btn_constancia_rentas" => "Podés consultar tu Constancia de Inscripción en Rentas de Neuquén desde el siguiente link:\n\nhttps://rentasneuquenweb.gob.ar/nqn/SCF/cons_inscripcion.php"
     ];
     $texto = $respuestas[$id] ?? "Opción no válida.";
     enviar_texto($to, $token, $pid, $texto);
