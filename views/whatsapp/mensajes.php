@@ -1,4 +1,48 @@
-<?php ob_start(); ?>
+<?php
+ob_start(); // $extraJs – se inyecta DESPUÉS de que jQuery carga
+?>
+<script>
+$(document).ready(function () {
+    $('#tablaMensajes').DataTable({
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+        order: [[0, 'desc']],
+        pageLength: 25,
+        columnDefs: [{ orderable: false, targets: 5 }]
+    });
+});
+
+// Función global: llamada desde onclick en <tr> (ejecuta cuando el usuario hace click, Bootstrap ya cargó)
+function wpAbrirModal(el) {
+    poblarModal(el.dataset.numero || '', el.dataset.nombre || '');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalResponder')).show();
+}
+
+function poblarModal(numero, nombre) {
+    document.getElementById('responderNumero').value        = numero;
+    document.getElementById('responderNumeroDisplay').value = numero;
+    document.getElementById('responderNombre').textContent  = nombre || 'nuevo número';
+    document.getElementById('tipoTexto').checked = true;
+    document.getElementById('campoMensaje').style.display = '';
+    document.querySelector('#formResponder textarea').value = '';
+}
+
+// Botones con data-bs-toggle pasan por show.bs.modal
+document.getElementById('modalResponder').addEventListener('show.bs.modal', function (e) {
+    var btn = e.relatedTarget;
+    if (btn && btn.dataset.numero !== undefined) {
+        poblarModal(btn.dataset.numero, btn.dataset.nombre || '');
+    }
+});
+
+document.querySelectorAll('input[name="tipo"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+        document.getElementById('campoMensaje').style.display = this.value === 'menu' ? 'none' : '';
+    });
+});
+</script>
+<?php $extraJs = ob_get_clean(); ?>
+
+<?php ob_start(); // $content empieza aquí ?>
 
 <!-- Modal responder -->
 <div class="modal fade" id="modalResponder" tabindex="-1">
@@ -51,7 +95,9 @@
         <span><i class="bi bi-chat-dots"></i> Mensajes recibidos</span>
         <div class="d-flex gap-2 align-items-center">
             <span class="badge bg-secondary"><?= count($mensajes) ?></span>
-            <button class="btn btn-success btn-sm" id="btnMensajeNuevo">
+            <button class="btn btn-success btn-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalResponder"
+                    data-numero="" data-nombre="">
                 <i class="bi bi-plus-lg"></i> Mensaje nuevo
             </button>
         </div>
@@ -79,7 +125,7 @@
                 <tr style="cursor:pointer"
                     data-numero="<?= e($m['from_number']) ?>"
                     data-nombre="<?= e($m['contact_name'] ?? $m['from_number']) ?>"
-                    onclick="abrirModal(this)">
+                    onclick="wpAbrirModal(this)">
                     <td class="text-muted small text-nowrap">
                         <?= date('d/m/y H:i', strtotime($m['created_at'])) ?>
                     </td>
@@ -100,8 +146,9 @@
                             <?= e(mb_strimwidth($m['body'] ?? '', 0, 80, '…')) ?>
                         <?php endif; ?>
                     </td>
-                    <td class="text-nowrap">
-                        <button class="btn btn-success btn-sm btn-reply"
+                    <td class="text-nowrap" onclick="event.stopPropagation()">
+                        <button class="btn btn-success btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#modalResponder"
                                 data-numero="<?= e($m['from_number']) ?>"
                                 data-nombre="<?= e($m['contact_name'] ?? $m['from_number']) ?>"
                                 title="Responder">
