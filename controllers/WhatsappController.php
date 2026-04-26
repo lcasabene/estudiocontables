@@ -46,9 +46,15 @@ class WhatsappController
         }
 
         $numero = $row['from_number'];
-        $this->enviarMenu($numero);
+        $result = $this->enviarMenu($numero);
 
-        Session::flash('success', "Menú reenviado a {$numero}.");
+        if ($result['status'] === 200) {
+            Session::flash('success', "Menú reenviado a {$numero}.");
+        } else {
+            $err = json_decode($result['response'], true);
+            $detalle = $err['error']['message'] ?? $result['response'];
+            Session::flash('error', "Error al enviar (HTTP {$result['status']}): {$detalle}");
+        }
         redirect(tenant_url('whatsapp/mensajes'));
     }
 
@@ -56,19 +62,36 @@ class WhatsappController
     {
         $numero  = trim($_POST['numero'] ?? '');
         $mensaje = trim($_POST['mensaje'] ?? '');
+        $tipo    = trim($_POST['tipo'] ?? 'texto');
 
-        if (!$numero || !$mensaje) {
-            Session::flash('error', 'Número y mensaje son obligatorios.');
+        if (!$numero) {
+            Session::flash('error', 'El número es obligatorio.');
             redirect(tenant_url('whatsapp/mensajes'));
             return;
         }
 
-        $this->enviarTexto($numero, $mensaje);
-        Session::flash('success', "Mensaje enviado a {$numero}.");
+        if ($tipo === 'menu') {
+            $result = $this->enviarMenu($numero);
+        } else {
+            if (!$mensaje) {
+                Session::flash('error', 'El mensaje no puede estar vacío.');
+                redirect(tenant_url('whatsapp/mensajes'));
+                return;
+            }
+            $result = $this->enviarTexto($numero, $mensaje);
+        }
+
+        if ($result['status'] === 200) {
+            Session::flash('success', "Mensaje enviado correctamente a {$numero}.");
+        } else {
+            $err = json_decode($result['response'], true);
+            $detalle = $err['error']['message'] ?? $result['response'];
+            Session::flash('error', "Error al enviar (HTTP {$result['status']}): {$detalle}");
+        }
         redirect(tenant_url('whatsapp/mensajes'));
     }
 
-    private function enviarMenu(string $to): void
+    private function enviarMenu(string $to): array
     {
         $url  = "https://graph.facebook.com/v20.0/{$this->phoneId}/messages";
         $json = [
@@ -103,10 +126,10 @@ class WhatsappController
                 ]
             ]
         ];
-        $this->apiCall($url, $json);
+        return $this->apiCall($url, $json);
     }
 
-    private function enviarTexto(string $to, string $text): void
+    private function enviarTexto(string $to, string $text): array
     {
         $url  = "https://graph.facebook.com/v20.0/{$this->phoneId}/messages";
         $json = [
@@ -115,10 +138,10 @@ class WhatsappController
             "type" => "text",
             "text" => ["body" => $text],
         ];
-        $this->apiCall($url, $json);
+        return $this->apiCall($url, $json);
     }
 
-    private function apiCall(string $url, array $payload): void
+    private function apiCall(string $url, array $payload): array
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -128,7 +151,14 @@ class WhatsappController
             "Content-Type: application/json",
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        $response = curl_exec($ch);
+        $status   = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
         curl_close($ch);
+        if ($curlErr) {
+            return ['status' => 0, 'response' => $curlErr];
+        }
+        return ['status' => $status, 'response' => $response];
     }
 }
